@@ -4,7 +4,6 @@ from sympy.core.basic import C, sympify, cacheit
 from sympy.core.singleton import S
 from sympy.core.function import Function, ArgumentIndexError
 from miscellaneous import sqrt
-from hyperbolic import sinh, csch, cosh, sech, tanh, coth
 
 ###############################################################################
 ########################## TRIGONOMETRIC FUNCTIONS ############################
@@ -12,6 +11,8 @@ from hyperbolic import sinh, csch, cosh, sech, tanh, coth
 
 class TrigonometricFunction(Function):
     """Base class for trigonometric functions. """
+
+    nargs = 1
 
     def _eval_expand_complex(self, deep=True, **hints):
         re_part, im_part = self.as_real_imag(deep=deep, **hints)
@@ -147,8 +148,6 @@ class sin(TrigonometricFunction):
          U{Definitions in trigonometry<http://planetmath.org/encyclopedia/DefinitionsInTrigonometry.html>}
     """
 
-    nargs = 1
-
     @classmethod
     def eval(cls, arg):
     # RECHECK
@@ -279,23 +278,23 @@ class sin(TrigonometricFunction):
         return 1 / csc(arg)
 
     def _eval_rewrite_as_sinh(self, arg):
-        return -S.ImaginaryUnit*sinh(S.ImaginaryUnit*arg)
+        return -S.ImaginaryUnit*C.sinh(S.ImaginaryUnit*arg)
 
     def _eval_rewrite_as_csch(self, arg):
-        return -S.ImaginaryUnit / csch(S.ImaginaryUnit*arg)
+        return -S.ImaginaryUnit / C.csch(S.ImaginaryUnit*arg)
 
     def _eval_rewrite_as_cosh(self, arg):
         return -cosh(S.ImaginaryUnit*arg + S.ImaginaryUnit*S.Pi/2)
 
     def _eval_rewrite_as_sech(self, arg):
-        return -1 / sech(S.ImaginaryUnit*arg + S.ImaginaryUnit*S.Pi/2)
+        return -1 / C.sech(S.ImaginaryUnit*arg + S.ImaginaryUnit*S.Pi/2)
 
     def _eval_rewrite_as_tanh(self, arg):
-        tanh_half = tanh(S.ImaginaryUnit*S.Half*arg)
+        tanh_half = C.tanh(S.ImaginaryUnit*S.Half*arg)
         return 2*S.ImaginaryUnit*tanh_half / (tanh_half**2 - 1)
 
     def _eval_rewrite_as_coth(self, arg):
-        coth_half = coth(S.ImaginaryUnit*S.Half*arg)
+        coth_half = C.coth(S.ImaginaryUnit*S.Half*arg)
         return 2*S.ImaginaryUnit*coth_half / (1 - coth_half**2)
 
 
@@ -314,7 +313,7 @@ class sin(TrigonometricFunction):
             re, im = self.args[0].expand(deep, **hints).as_real_imag()
         else:
             re, im = self.args[0].as_real_imag()
-        return (sin(re)*cosh(im), cos(re)*sinh(im))
+        return (sin(re)*cosh(im), cos(re)*C.sinh(im))
 
 
     def _eval_expand_trig(self, deep=True, **hints):
@@ -323,7 +322,7 @@ class sin(TrigonometricFunction):
         else:
             arg = self.args[0]
         x = None
-        if arg.is_Add: # TODO, implement more if deep stuff here
+        if arg.is_Add:
             x, y = arg.as_two_terms()
         else:
             coeff, terms = arg.as_coeff_mul()
@@ -388,8 +387,6 @@ class cos(TrigonometricFunction):
 
          U{Definitions in trigonometry<http://planetmath.org/encyclopedia/DefinitionsInTrigonometry.html>}
     """
-
-    nargs = 1
 
     @classmethod
     def eval(cls, arg):
@@ -521,23 +518,23 @@ class cos(TrigonometricFunction):
         return 1 / csc(arg + s.Pi/2)
 
     def _eval_rewrite_as_sinh(self, arg):
-        return -S.ImaginaryUnit*sinh(S.ImaginaryUnit*arg + S.ImaginaryUnit*S.Pi/2)
+        return -S.ImaginaryUnit*C.sinh(S.ImaginaryUnit*arg + S.ImaginaryUnit*S.Pi/2)
 
     def _eval_rewrite_as_csch(self, arg):
-        return -S.ImaginaryUnit / csch(S.ImaginaryUnit*arg + S.ImaginaryUnit*S.Pi/2)
+        return -S.ImaginaryUnit / C.csch(S.ImaginaryUnit*arg + S.ImaginaryUnit*S.Pi/2)
 
     def _eval_rewrite_as_cosh(self, arg):
         return cosh(S.ImaginaryUnit*arg)
 
     def _eval_rewrite_as_sech(self, arg):
-        return 1 / sech(S.ImaginaryUnit*arg)
+        return 1 / C.sech(S.ImaginaryUnit*arg)
 
     def _eval_rewrite_as_tanh(self, arg):
-        tanh_half_sq = tanh(S.ImaginaryUnit*S.Half*arg)**2
+        tanh_half_sq = C.tanh(S.ImaginaryUnit*S.Half*arg)**2
         return (1 + tanh_half_sq) / (1 - tanh_half_sq)
 
     def _eval_rewrite_as_coth(self, arg):
-        coth_half_sq = coth(S.ImaginaryUnit*S.Half*arg)**2
+        coth_half_sq = C.coth(S.ImaginaryUnit*S.Half*arg)**2
         return (coth_half_sq + 1) / (coth_half_sq - 1)
 
 
@@ -556,17 +553,16 @@ class cos(TrigonometricFunction):
             re, im = self.args[0].expand(deep, **hints).as_real_imag()
         else:
             re, im = self.args[0].as_real_imag()
-        return (cos(re)*cosh(im), -sin(re)*sinh(im))
+        return (cos(re)*cosh(im), -sin(re)*C.sinh(im))
 
 
     def _eval_expand_trig(self, deep=True, **hints):
-        # RECHECK
         if deep:
             arg = self.args[0].expand()
         else:
             arg = self.args[0]
         x = None
-        if arg.is_Add: # TODO, implement more if deep stuff here
+        if arg.is_Add:
             x, y = arg.as_two_terms()
             return (cos(x)*cos(y) - sin(y)*sin(x)).expand(trig=True)
         else:
@@ -632,8 +628,6 @@ class tan(TrigonometricFunction):
 
          U{Definitions in trigonometry<http://planetmath.org/encyclopedia/DefinitionsInTrigonometry.html>}
     """
-
-    nargs = 1
 
     @classmethod
     def eval(cls, arg):
@@ -729,36 +723,23 @@ class tan(TrigonometricFunction):
         return atan
 
 
+    def _eval_subs(self, old, new):
+    # RECHECK
+        if self == old:
+            return new
+        arg = self.args[0]
+        argnew = arg.subs(old, new)
+        if arg != argnew and (argnew/(S.Pi/2)).is_odd:
+            return S.NaN
+        return tan(argnew)
+
+
     def _eval_nseries(self, x, n, logx):
     # RECHECK
         i = self.args[0].limit(x, 0)*2/S.Pi
         if i and i.is_Integer:
             return self.rewrite(cos)._eval_nseries(x, n=n, logx=logx)
         return Function._eval_nseries(self, x, n=n, logx=logx)
-
-
-    def _eval_conjugate(self):
-        return self.func(self.args[0].conjugate())
-
-
-    def as_real_imag(self, deep=True, **hints):
-        if self.args[0].is_real:
-            if deep:
-                hints['complex'] = False
-                return (self.expand(deep, **hints), S.Zero)
-            else:
-                return (self, S.Zero)
-        if deep:
-            re, im = self.args[0].expand(deep, **hints).as_real_imag()
-        else:
-            re, im = self.args[0].as_real_imag()
-        denom = cos(2*re) + cosh(2*im)
-        return (sin(2*re)/denom, sinh(2*im)/denom)
-
-
-    def _eval_expand_trig(self, deep=True, **hints):
-    # RECHECK
-        return self
 
 
     def _eval_rewrite_as_exp(self, arg):
@@ -782,22 +763,49 @@ class tan(TrigonometricFunction):
         return csc(S.Pi/2 + arg) / csc(arg)
 
     def _eval_rewrite_as_sinh(self, arg):
-        return sinh(S.ImaginaryUnit*arg) / sinh(S.ImaginaryUnit*arg + S.ImaginaryUnit*S.Pi/2)
+        return C.sinh(S.ImaginaryUnit*arg) / C.sinh(S.ImaginaryUnit*arg + S.ImaginaryUnit*S.Pi/2)
 
     def _eval_rewrite_as_csch(self, arg):
-        return scsh(S.ImaginaryUnit*arg + S.ImaginaryUnit*S.Pi/2) / csch(S.ImaginaryUnit*arg)
+        return scsh(S.ImaginaryUnit*arg + S.ImaginaryUnit*S.Pi/2) / C.csch(S.ImaginaryUnit*arg)
 
     def _eval_rewrite_as_cosh(self, arg):
         return -(S.ImaginaryUnit*arg + S.ImaginaryUnit*S.Pi/2) / cosh(S.ImaginaryUnit*arg)
 
     def _eval_rewrite_as_sech(self, arg):
-        return -sech(S.ImaginaryUnit*arg) / (S.ImaginaryUnit*arg + S.ImaginaryUnit*S.Pi/2)
+        return -C.sech(S.ImaginaryUnit*arg) / (S.ImaginaryUnit*arg + S.ImaginaryUnit*S.Pi/2)
 
     def _eval_rewrite_as_tanh(self, arg):
-        return -S.ImaginaryUnit*tanh(S.ImaginaryUnit*arg)
+        return -S.ImaginaryUnit*C.tanh(S.ImaginaryUnit*arg)
 
     def _eval_rewrite_as_coth(self, arg):
-        return -S.ImaginaryUnit / coth(S.ImaginaryUnit*arg)
+        return -S.ImaginaryUnit / C.coth(S.ImaginaryUnit*arg)
+
+
+    def _eval_conjugate(self):
+        return self.func(self.args[0].conjugate())
+
+
+    def as_real_imag(self, deep=True, **hints):
+        if self.args[0].is_real:
+            if deep:
+                hints['complex'] = False
+                return (self.expand(deep, **hints), S.Zero)
+            else:
+                return (self, S.Zero)
+        if deep:
+            re, im = self.args[0].expand(deep, **hints).as_real_imag()
+        else:
+            re, im = self.args[0].as_real_imag()
+        denom = cos(2*re) + cosh(2*im)
+        return (sin(2*re)/denom, C.sinh(2*im)/denom)
+
+
+    def _eval_expand_trig(self, deep=True, **hints):
+        if deep:
+            arg = self.args[0].expand()
+        else:
+            arg = self.args[0]
+        return tan(arg)
 
 
     def _eval_is_real(self):
@@ -808,17 +816,6 @@ class tan(TrigonometricFunction):
         arg = self.args[0]
         if arg.is_imaginary:
             return True
-
-
-    def _eval_subs(self, old, new):
-    # RECHECK
-        if self == old:
-            return new
-        arg = self.args[0]
-        argnew = arg.subs(old, new)
-        if arg != argnew and (argnew/(S.Pi/2)).is_odd:
-            return S.NaN
-        return tan(argnew)
 
 
     def _sage_(self):
@@ -840,8 +837,6 @@ class cot(TrigonometricFunction):
        L{sinh}, L{csch}, L{cosh}, L{sech}, L{tanh}, L{coth}
        L{asinh}, L{acsch}, L{acosh}, L{asech}, L{atanh}, L{acoth}
     """
-
-    nargs = 1
 
     @classmethod
     def eval(cls, arg):
@@ -939,33 +934,23 @@ class cot(TrigonometricFunction):
         return acot
 
 
+    def _eval_subs(self, old, new):
+    # RECHECK
+        if self == old:
+            return new
+        arg = self.args[0]
+        argnew = arg.subs(old, new)
+        if arg != argnew and (argnew/S.Pi).is_integer:
+            return S.NaN
+        return cot(argnew)
+
+
     def _eval_nseries(self, x, n, logx):
     # RECHECK
         i = self.args[0].limit(x, 0)/S.Pi
         if i and i.is_Integer:
             return self.rewrite(cos)._eval_nseries(x, n=n, logx=logx)
         return Function._eval_nseries(self, x, n=n, logx=logx)
-
-
-    def _eval_conjugate(self):
-        # Why the assertion here (and only here?)
-        assert len(self.args) == 1
-        return self.func(self.args[0].conjugate())
-
-
-    def as_real_imag(self, deep=True, **hints):
-        if self.args[0].is_real:
-            if deep:
-                hints['complex'] = False
-                return (self.expand(deep, **hints), S.Zero)
-            else:
-                return (self, S.Zero)
-        if deep:
-            re, im = self.args[0].expand(deep, **hints).as_real_imag()
-        else:
-            re, im = self.args[0].as_real_imag()
-        denom = cos(2*re) - cosh(2*im)
-        return (-sin(2*re)/denom, sinh(2*im)/denom)
 
 
     def _eval_rewrite_as_exp(self, arg):
@@ -989,22 +974,22 @@ class cot(TrigonometricFunction):
         return csc(arg) / csc(arg + S.Pi/2)
 
     def _eval_rewrite_as_sinh(self, arg):
-        return sinh(S.ImaginaryUnit*arg + S.ImaginaryUnit*S.Pi/2) / sinh(S.ImaginaryUnit*arg)
+        return C.sinh(S.ImaginaryUnit*arg + S.ImaginaryUnit*S.Pi/2) / C.sinh(S.ImaginaryUnit*arg)
 
     def _eval_rewrite_as_csch(self, arg):
-        return csch(S.ImaginaryUnit*arg) / csch(S.ImaginaryUnit*arg + S.ImaginaryUnit*S.Pi/2)
+        return C.csch(S.ImaginaryUnit*arg) / C.csch(S.ImaginaryUnit*arg + S.ImaginaryUnit*S.Pi/2)
 
     def _eval_rewrite_as_cosh(self, arg):
-        return -coth(S.ImaginaryUnit*arg) / coth(S.ImaginaryUnit*arg + S.ImaginaryUnit*S.Pi/2)
+        return -C.coth(S.ImaginaryUnit*arg) / C.coth(S.ImaginaryUnit*arg + S.ImaginaryUnit*S.Pi/2)
 
     def _eval_rewrite_as_sech(self, arg):
-        return -sech(S.ImaginaryUnit*arg + S.ImaginaryUnit*S.Pi/2) / sech(S.ImaginaryUnit*arg)
+        return -C.sech(S.ImaginaryUnit*arg + S.ImaginaryUnit*S.Pi/2) / C.sech(S.ImaginaryUnit*arg)
 
     def _eval_rewrite_as_tanh(self, arg):
-        return S.ImaginaryUnit / tanh(S.ImaginaryUnit*arg)
+        return S.ImaginaryUnit / C.tanh(S.ImaginaryUnit*arg)
 
     def _eval_rewrite_as_coth(self, arg):
-        return S.ImaginaryUnit*coth(S.ImaginaryUnit*arg)
+        return S.ImaginaryUnit*C.coth(S.ImaginaryUnit*arg)
 
 
     def _eval_as_leading_term(self, x):
@@ -1015,19 +1000,35 @@ class cot(TrigonometricFunction):
             return self.func(arg)
 
 
+    def _eval_conjugate(self):
+        return self.func(self.args[0].conjugate())
+
+
+    def as_real_imag(self, deep=True, **hints):
+        if self.args[0].is_real:
+            if deep:
+                hints['complex'] = False
+                return (self.expand(deep, **hints), S.Zero)
+            else:
+                return (self, S.Zero)
+        if deep:
+            re, im = self.args[0].expand(deep, **hints).as_real_imag()
+        else:
+            re, im = self.args[0].as_real_imag()
+        denom = cos(2*re) - cosh(2*im)
+        return (-sin(2*re)/denom, C.sinh(2*im)/denom)
+
+
+    def _eval_expand_trig(self, deep=True, **hints):
+        if deep:
+            arg = self.args[0].expand()
+        else:
+            arg = self.args[0]
+        return cot(arg)
+
+
     def _eval_is_real(self):
         return self.args[0].is_real
-
-
-    def _eval_subs(self, old, new):
-    # RECHECK
-        if self == old:
-            return new
-        arg = self.args[0]
-        argnew = arg.subs(old, new)
-        if arg != argnew and (argnew/S.Pi).is_integer:
-            return S.NaN
-        return cot(argnew)
 
 
     def _eval_is_bounded(self):
@@ -1073,8 +1074,6 @@ class sec(TrigonometricFunction):
 
          U{Definitions in trigonometry<http://planetmath.org/encyclopedia/DefinitionsInTrigonometry.html>}
     """
-
-    nargs = 1
 
     @classmethod
     def eval(cls, arg):
@@ -1174,6 +1173,18 @@ class sec(TrigonometricFunction):
         return asec
 
 
+    def _eval_subs(self, old, new):
+    # RECHECK
+        pass
+        # if self == old:
+        #     return new
+        # arg = self.args[0]
+        # argnew = arg.subs(old, new)
+        # if arg != argnew and (argnew/(S.Pi/2)).is_odd:
+        #     return S.NaN
+        # return tan(argnew)
+
+
     def _eval_nseries(self, x, n, logx):
     # RECHECK
         pass
@@ -1181,30 +1192,6 @@ class sec(TrigonometricFunction):
         # if i and i.is_Integer:
         #     return self.rewrite(cos)._eval_nseries(x, n=n, logx=logx)
         # return Function._eval_nseries(self, x, n=n, logx=logx)
-
-
-    def _eval_conjugate(self):
-        return self.func(self.args[0].conjugate())
-
-
-    def as_real_imag(self, deep=True, **hints):
-        if self.args[0].is_real:
-            if deep:
-                hints['complex'] = False
-                return (self.expand(deep, **hints), S.Zero)
-            else:
-                return (self, S.Zero)
-        if deep:
-            re, im = self.args[0].expand(deep, **hints).as_real_imag()
-        else:
-            re, im = self.args[0].as_real_imag()
-        denom = cos(2*re) + cosh(2*im)
-        return (2*cos(re)*cosh(im)/denom, 2*sin(re)*sinh(im)/denom)
-
-
-    def _eval_expand_trig(self, deep=True, **hints):
-    # RECHECK
-        return self
 
 
     def _eval_rewrite_as_exp(self, arg):
@@ -1229,23 +1216,23 @@ class sec(TrigonometricFunction):
         return csc(arg + S.Pi/2)
 
     def _eval_rewrite_as_sinh(self, arg):
-        return S.ImaginaryUnit / sinh(S.ImaginaryUnit*arg + S.ImaginaryUnit*S.Pi/2)
+        return S.ImaginaryUnit / C.sinh(S.ImaginaryUnit*arg + S.ImaginaryUnit*S.Pi/2)
 
     def _eval_rewrite_as_csch(self, arg):
-        return S.ImaginaryUnit*csch(S.ImaginaryUnit*arg + S.ImaginaryUnit*S.Pi/2)
+        return S.ImaginaryUnit*C.csch(S.ImaginaryUnit*arg + S.ImaginaryUnit*S.Pi/2)
 
     def _eval_rewrite_as_cosh(self, arg):
         return 1 / cosh(S.ImaginaryUnit*arg)
 
     def _eval_rewrite_as_sech(self, arg):
-        return sech(S.ImaginaryUnit*arg)
+        return C.sech(S.ImaginaryUnit*arg)
 
     def _eval_rewrite_as_tanh(self, arg):
-        tanh_half_sq = tanh(S.Half*S.ImaginaryUnit*arg)**2
+        tanh_half_sq = C.tanh(S.Half*S.ImaginaryUnit*arg)**2
         return (1 - tanh_half_sq) / (1 + tanh_half_sq)
 
     def _eval_rewrite_as_coth(self, arg):
-        coth_half_sq = coth(S.Half*S.ImaginaryUnit*arg)**2
+        coth_half_sq = C.coth(S.Half*S.ImaginaryUnit*arg)**2
         return (tanh_half_sq - 1) / (tanh_half_sq + 1)
 
 
@@ -1258,6 +1245,33 @@ class sec(TrigonometricFunction):
             return self.func(arg)
 
 
+    def _eval_conjugate(self):
+        return self.func(self.args[0].conjugate())
+
+
+    def as_real_imag(self, deep=True, **hints):
+        if self.args[0].is_real:
+            if deep:
+                hints['complex'] = False
+                return (self.expand(deep, **hints), S.Zero)
+            else:
+                return (self, S.Zero)
+        if deep:
+            re, im = self.args[0].expand(deep, **hints).as_real_imag()
+        else:
+            re, im = self.args[0].as_real_imag()
+        denom = cos(2*re) + cosh(2*im)
+        return (2*cos(re)*cosh(im)/denom, 2*sin(re)*C.sinh(im)/denom)
+
+
+    def _eval_expand_trig(self, deep=True, **hints):
+        if deep:
+            arg = self.args[0].expand()
+        else:
+            arg = self.args[0]
+        return sec(arg)
+
+
     def _eval_is_real(self):
         return self.args[0].is_real
 
@@ -1266,18 +1280,6 @@ class sec(TrigonometricFunction):
         arg = self.args[0]
         if arg.is_imaginary:
             return True
-
-
-    def _eval_subs(self, old, new):
-    # RECHECK
-        pass
-        # if self == old:
-        #     return new
-        # arg = self.args[0]
-        # argnew = arg.subs(old, new)
-        # if arg != argnew and (argnew/(S.Pi/2)).is_odd:
-        #     return S.NaN
-        # return tan(argnew)
 
 
     def _sage_(self):
@@ -1317,8 +1319,6 @@ class csc(TrigonometricFunction):
 
          U{Definitions in trigonometry<http://planetmath.org/encyclopedia/DefinitionsInTrigonometry.html>}
     """
-
-    nargs = 1
 
     @classmethod
     def eval(cls, arg):
@@ -1417,6 +1417,18 @@ class csc(TrigonometricFunction):
         return acsc
 
 
+    def _eval_subs(self, old, new):
+    # RECHECK
+        pass
+        # if self == old:
+        #     return new
+        # arg = self.args[0]
+        # argnew = arg.subs(old, new)
+        # if arg != argnew and (argnew/(S.Pi/2)).is_odd:
+        #     return S.NaN
+        # return tan(argnew)
+
+
     def _eval_nseries(self, x, n, logx):
     # RECHECK
         pass
@@ -1424,30 +1436,6 @@ class csc(TrigonometricFunction):
         # if i and i.is_Integer:
         #     return self.rewrite(cos)._eval_nseries(x, n=n, logx=logx)
         # return Function._eval_nseries(self, x, n=n, logx=logx)
-
-
-    def _eval_conjugate(self):
-        return self.func(self.args[0].conjugate())
-
-
-    def as_real_imag(self, deep=True, **hints):
-        if self.args[0].is_real:
-            if deep:
-                hints['complex'] = False
-                return (self.expand(deep, **hints), S.Zero)
-            else:
-                return (self, S.Zero)
-        if deep:
-            re, im = self.args[0].expand(deep, **hints).as_real_imag()
-        else:
-            re, im = self.args[0].as_real_imag()
-        denom = cos(2*re) - cosh(2*im)
-        return (-2*sin(re)*cosh(im)/denom, 2*cos(re)*sinh(im)/denom)
-
-
-    def _eval_expand_trig(self, deep=True, **hints):
-    # RECHECK
-        return self
 
 
     def _eval_rewrite_as_exp(self, arg):
@@ -1472,23 +1460,23 @@ class csc(TrigonometricFunction):
         return -sec(arg + S.Pi/2)
 
     def _eval_rewrite_as_sinh(self, arg):
-        return S.ImaginaryUnit / sinh(S.ImaginaryUnit*arg)
+        return S.ImaginaryUnit / C.sinh(S.ImaginaryUnit*arg)
 
     def _eval_rewrite_as_csch(self, arg):
-        return S.ImaginaryUnit * csch(S.ImaginaryUnit*arg)
+        return S.ImaginaryUnit * C.csch(S.ImaginaryUnit*arg)
 
     def _eval_rewrite_as_cosh(self, arg):
         return -1 / cosh(S.ImaginaryUnit*arg + S.ImaginaryUnit*S.Pi/2)
 
     def _eval_rewrite_as_sech(self, arg):
-        return -sech(S.ImaginaryUnit*arg + S.ImaginaryUnit*S.Pi/2)
+        return -C.sech(S.ImaginaryUnit*arg + S.ImaginaryUnit*S.Pi/2)
 
     def _eval_rewrite_as_tanh(self, arg):
-        tanh_half = tanh(S.ImaginaryUnit*arg/2)
+        tanh_half = C.tanh(S.ImaginaryUnit*arg/2)
         return (S.ImaginaryUnit - S.ImaginaryUnit*tanh_half**2) / (2*tanh_half)
 
     def _eval_rewrite_as_coth(self, arg):
-        coth_half = coth(S.ImaginaryUnit*arg/2)
+        coth_half = C.coth(S.ImaginaryUnit*arg/2)
         return  (S.ImaginaryUnit + S.ImaginaryUnit*coth_half**2) / (2*coth_half)
 
 
@@ -1498,6 +1486,33 @@ class csc(TrigonometricFunction):
             return 1/arg
         else:
             return self.func(arg)
+
+
+    def _eval_conjugate(self):
+        return self.func(self.args[0].conjugate())
+
+
+    def as_real_imag(self, deep=True, **hints):
+        if self.args[0].is_real:
+            if deep:
+                hints['complex'] = False
+                return (self.expand(deep, **hints), S.Zero)
+            else:
+                return (self, S.Zero)
+        if deep:
+            re, im = self.args[0].expand(deep, **hints).as_real_imag()
+        else:
+            re, im = self.args[0].as_real_imag()
+        denom = cos(2*re) - cosh(2*im)
+        return (-2*sin(re)*cosh(im)/denom, 2*cos(re)*C.sinh(im)/denom)
+
+
+    def _eval_expand_trig(self, deep=True, **hints):
+        if deep:
+            arg = self.args[0].expand()
+        else:
+            arg = self.args[0]
+        return csc(arg)
 
 
     def _eval_is_real(self):
@@ -1510,18 +1525,6 @@ class csc(TrigonometricFunction):
             return True
 
 
-    def _eval_subs(self, old, new):
-    # RECHECK
-        pass
-        # if self == old:
-        #     return new
-        # arg = self.args[0]
-        # argnew = arg.subs(old, new)
-        # if arg != argnew and (argnew/(S.Pi/2)).is_odd:
-        #     return S.NaN
-        # return tan(argnew)
-
-
     def _sage_(self):
         import sage.all as sage
         return sage.csc(self.args[0]._sage_())
@@ -1532,8 +1535,8 @@ class csc(TrigonometricFunction):
 ###############################################################################
 
 class InverseTrigonometricFunction(Function):
-    """Base class for trigonometric functions. """
-    pass
+    """Base class for inverse trigonometric functions."""
+    nargs = 1
 
 
 class asin(InverseTrigonometricFunction):
@@ -1562,9 +1565,6 @@ class asin(InverseTrigonometricFunction):
        L{sinh}, L{csch}, L{cosh}, L{sech}, L{tanh}, L{coth}
        L{asinh}, L{acsch}, L{acosh}, L{asech}, L{atanh}, L{acoth}
     """
-
-    nargs = 1
-
 
     @classmethod
     def eval(cls, arg):
@@ -1699,9 +1699,6 @@ class acos(InverseTrigonometricFunction):
        L{asinh}, L{acsch}, L{acosh}, L{asech}, L{atanh}, L{acoth}
     """
 
-    nargs = 1
-
-
     @classmethod
     def eval(cls, arg):
     # RECHECK
@@ -1824,9 +1821,6 @@ class atan(InverseTrigonometricFunction):
        L{asinh}, L{acsch}, L{acosh}, L{asech}, L{atanh}, L{acoth}
     """
 
-    nargs = 1
-
-
     @classmethod
     def eval(cls, arg):
     # RECHECK
@@ -1944,9 +1938,6 @@ class acot(InverseTrigonometricFunction):
        L{sinh}, L{csch}, L{cosh}, L{sech}, L{tanh}, L{coth}
        L{asinh}, L{acsch}, L{acosh}, L{asech}, L{atanh}, L{acoth}
     """
-
-    nargs = 1
-
 
     @classmethod
     def eval(cls, arg):
@@ -2084,9 +2075,6 @@ class asec(InverseTrigonometricFunction):
        L{asinh}, L{acsch}, L{acosh}, L{asech}, L{atanh}, L{acoth}
     """
 
-    nargs = 1
-
-
     @classmethod
     def eval(cls, arg):
     # RECHECK
@@ -2210,9 +2198,6 @@ class acsc(InverseTrigonometricFunction):
        L{sinh}, L{csch}, L{cosh}, L{sech}, L{tanh}, L{coth}
        L{asinh}, L{acsch}, L{acosh}, L{asech}, L{atanh}, L{acoth}
     """
-
-    nargs = 1
-
 
     @classmethod
     def eval(cls, arg):

@@ -10,6 +10,8 @@ from sympy.functions.elementary.miscellaneous import sqrt
 class HyperbolicFunction(Function):
     """Base class for hyperbolic functions."""
 
+    nargs = 1
+
     def _eval_expand_complex(self, deep=True, **hints):
         re_part, im_part = self.as_real_imag(deep=deep, **hints)
         return re_part + im_part*S.ImaginaryUnit
@@ -28,9 +30,6 @@ class sinh(HyperbolicFunction):
        L{csch}, L{cosh}, L{sech}, L{tanh}, L{coth}
        L{asinh}, L{acsch}, L{acosh}, L{asech}, L{atanh}, L{acoth}
     """
-
-    nargs = 1
-
 
     @classmethod
     def eval(cls, arg):
@@ -103,6 +102,47 @@ class sinh(HyperbolicFunction):
         return asinh
 
 
+    def _eval_rewrite_as_exp(self, arg):
+        return (C.exp(arg) - C.exp(-arg)) / 2
+
+    def _eval_rewrite_as_csch(self, arg):
+        return 1 / csch(arg)
+
+    def _eval_rewrite_as_cosh(self, arg):
+        return -S.ImaginaryUnit * cosh(arg + S.Pi*S.ImaginaryUnit/2)
+
+    def _eval_rewrite_as_sech(self, arg):
+        return -S.ImaginaryUnit / sech(arg + S.Pi*S.ImaginaryUnit/2)
+
+    def _eval_rewrite_as_tanh(self, arg):
+        tanh_half = tanh(S.Half*arg)
+        return 2*tanh_half / (1 - tanh_half**2)
+
+    def _eval_rewrite_as_coth(self, arg):
+        coth_half = coth(S.Half*arg)
+        return 2*coth_half / (coth_half**2 - 1)
+
+    def _eval_rewrite_as_sin(self, arg):
+        return -S.ImaginaryUnit * C.sin(S.ImaginaryUnit*arg)
+
+    def _eval_rewrite_as_csc(self, arg):
+        return -S.ImaginaryUnit / C.csc(S.ImaginaryUnit*arg)
+
+    def _eval_rewrite_as_cos(self, arg):
+        return S.ImaginaryUnit * C.cos(S.ImaginaryUnit*arg + S.Pi/2)
+
+    def _eval_rewrite_as_sec(self, arg):
+        return S.ImaginaryUnit / C.sec(S.ImaginaryUnit*arg + S.Pi/2)
+
+    def _eval_rewrite_as_tan(self, arg):
+        tan_half = C.tan(S.ImaginaryUnit*S.Half*arg)
+        return -2*S.ImaginaryUnit*tan_half / (tan_half**2 + 1)
+
+    def _eval_rewrite_as_cot(self, arg):
+        cot_half = C.cot(S.ImaginaryUnit*S.Half*arg)
+        return -2*S.ImaginaryUnit*cot_half / (cot_half**2 + 1)
+
+
     def _eval_conjugate(self):
         return self.func(self.args[0].conjugate())
 
@@ -122,24 +162,7 @@ class sinh(HyperbolicFunction):
         return (sinh(re)*C.cos(im), cosh(re)*C.sin(im))
 
 
-    # RECHECK ALL
-    def _eval_rewrite_as_exp(self, arg):
-        return (C.exp(arg) - C.exp(-arg)) / 2
-
-    def _eval_rewrite_as_cosh(self, arg):
-        return -S.ImaginaryUnit*cosh(arg + S.Pi*S.ImaginaryUnit/2)
-
-    def _eval_rewrite_as_tanh(self, arg):
-        tanh_half = tanh(S.Half*arg)
-        return 2*tanh_half/(1 - tanh_half**2)
-
-    def _eval_rewrite_as_coth(self, arg):
-        coth_half = coth(S.Half*arg)
-        return 2*coth_half/(coth_half**2 - 1)
-
-
     def _eval_is_real(self):
-    # RECHECK
         return self.args[0].is_real
 
 
@@ -168,8 +191,6 @@ class cosh(HyperbolicFunction):
        L{sinh}, L{csch}, L{sech}, L{tanh}, L{coth}
        L{asinh}, L{acsch}, L{acosh}, L{asech}, L{atanh}, L{acoth}
     """
-
-    nargs = 1
 
     @classmethod
     def eval(cls, arg):
@@ -240,6 +261,47 @@ class cosh(HyperbolicFunction):
         return acosh
 
 
+    def _eval_rewrite_as_exp(self, arg):
+        return (C.exp(arg) + C.exp(-arg)) / 2
+
+    def _eval_rewrite_as_sinh(self, arg):
+        return -S.ImaginaryUnit*sinh(arg + S.Pi*S.ImaginaryUnit/2)
+
+    def _eval_rewrite_as_csch(self, arg):
+        return -S.ImaginaryUnit / csch(arg + S.Pi*S.ImaginaryUnit/2)
+
+    def _eval_rewrite_as_sech(self, arg):
+        return 1 / sech(arg)
+
+    def _eval_rewrite_as_tanh(self, arg):
+        tanh_half = tanh(S.Half*arg)**2
+        return (1 + tanh_half) / (1 - tanh_half)
+
+    def _eval_rewrite_as_coth(self, arg):
+        coth_half = coth(S.Half*arg)**2
+        return (coth_half + 1) / (coth_half - 1)
+
+    def _eval_rewrite_as_sin(self, arg):
+        return C.sin(S.ImaginaryUnit*arg + S.Pi/2)
+
+    def _eval_rewrite_as_csc(self, arg):
+        return 1 / C.csc(S.ImaginaryUnit*arg + S.Pi/2)
+
+    def _eval_rewrite_as_cos(self, arg):
+        return C.cos(S.ImaginaryUnit*arg)
+
+    def _eval_rewrite_as_sec(self, arg):
+        return 1 / C.sec(S.ImaginaryUnit*arg)
+
+    def _eval_rewrite_as_tan(self, arg):
+        tan_half_sq = C.tan(S.ImaginaryUnit*S.Half*arg)**2
+        return (1 - tan_half_sq) / (1 + tan_half_sq)
+
+    def _eval_rewrite_as_cot(self, arg):
+        cot_half_sq = C.cot(S.ImaginaryUnit*S.Half*arg)**2
+        return (tan_half_sq - 1) / (tan_half_sq + 1)
+
+
     def _eval_conjugate(self):
         return self.func(self.args[0].conjugate())
 
@@ -260,24 +322,6 @@ class cosh(HyperbolicFunction):
         return (cosh(re)*C.cos(im), sinh(re)*C.sin(im))
 
 
-    def _eval_rewrite_as_exp(self, arg):
-    # RECHECK
-        return (C.exp(arg) + C.exp(-arg)) / 2
-
-    def _eval_rewrite_as_sinh(self, arg):
-    # RECHECK
-        return -S.ImaginaryUnit*sinh(arg + S.Pi*S.ImaginaryUnit/2)
-
-    # RECHECK ALL
-    def _eval_rewrite_as_tanh(self, arg):
-        tanh_half = tanh(S.Half*arg)**2
-        return (1+tanh_half)/(1-tanh_half)
-
-    def _eval_rewrite_as_coth(self, arg):
-        coth_half = coth(S.Half*arg)**2
-        return (coth_half+1)/(coth_half-1)
-
-
     def _eval_as_leading_term(self, x):
         arg = self.args[0].as_leading_term(x)
         if C.Order(1,x).contains(arg):
@@ -287,7 +331,6 @@ class cosh(HyperbolicFunction):
 
 
     def _eval_is_real(self):
-    # RECHECK
         return self.args[0].is_real
 
 
@@ -316,9 +359,6 @@ class tanh(HyperbolicFunction):
        L{sinh}, L{csch}, L{cosh}, L{sech}, L{coth}
        L{asinh}, L{acsch}, L{acosh}, L{asech}, L{atanh}, L{acoth}
     """
-
-    nargs = 1
-
 
     @classmethod
     def eval(cls, arg):
@@ -364,6 +404,7 @@ class tanh(HyperbolicFunction):
             if arg.func == acoth:
                 return 1/arg.args[0]
 
+
     @staticmethod
     @cacheit
     def taylor_term(n, x, *previous_terms):
@@ -392,6 +433,44 @@ class tanh(HyperbolicFunction):
         return atanh
 
 
+    def _eval_rewrite_as_exp(self, arg):
+        neg_exp, pos_exp = C.exp(-arg), C.exp(arg)
+        return (pos_exp - neg_exp) / (pos_exp + neg_exp)
+
+    def _eval_rewrite_as_sinh(self, arg):
+        return S.ImaginaryUnit*sinh(arg) / sinh(arg + S.Pi*S.ImaginaryUnit/2)
+
+    def _eval_rewrite_as_csch(self, arg):
+        return S.ImaginaryUnit*csch(arg + S.Pi*S.ImaginaryUnit/2)
+
+    def _eval_rewrite_as_cosh(self, arg):
+        return -S.ImaginaryUnit*cosh(arg + S.Pi*S.ImaginaryUnit/2) / cosh(arg)
+
+    def _eval_rewrite_as_sech(self, arg):
+        return -S.ImaginaryUnit*sech(arg) / sech(arg + S.Pi*S.ImaginaryUnit/2)
+
+    def _eval_rewrite_as_coth(self, arg):
+        return 1 / coth(arg)
+
+    def _eval_rewrite_as_sin(self, arg):
+        return -S.ImaginaryUnit*C.sin(S.ImaginaryUnit*arg) / C.sin(S.ImaginaryUnit*arg + S.Pi/2)
+
+    def _eval_rewrite_as_csc(self, arg):
+        return -S.ImaginaryUnit*C.csc(S.ImaginaryUnit*arg + S.Pi/2) / C.csc(S.ImaginaryUnit*arg)
+
+    def _eval_rewrite_as_cos(self, arg):
+        return S.ImaginaryUnit*C.cos(S.ImaginaryUnit*arg + S.Pi/2) / C.cos(S.ImaginaryUnit*arg)
+
+    def _eval_rewrite_as_sec(self, arg):
+        return S.ImaginaryUnit*C.sec(S.ImaginaryUnit*arg) / C.sec(S.ImaginaryUnit*arg + S.Pi/2)
+
+    def _eval_rewrite_as_tan(self, arg):
+        return -S.ImaginaryUnit*C.tan(S.ImaginaryUnit*arg)
+
+    def _eval_rewrite_as_cot(self, arg):
+        return S.ImaginaryUnit*C.cot(S.ImaginaryUnit*arg + S.Pi/2)
+
+
     def _eval_conjugate(self):
         return self.func(self.args[0].conjugate())
 
@@ -412,23 +491,7 @@ class tanh(HyperbolicFunction):
         return (sinh(re)*cosh(re)/denom, C.sin(im)*C.cos(im)/denom)
 
 
-    # RECHECK ALL
-    def _eval_rewrite_as_exp(self, arg):
-        neg_exp, pos_exp = C.exp(-arg), C.exp(arg)
-        return (pos_exp-neg_exp)/(pos_exp+neg_exp)
-
-    def _eval_rewrite_as_sinh(self, arg):
-        return S.ImaginaryUnit*sinh(arg)/sinh(S.Pi*S.ImaginaryUnit/2 - arg)
-
-    def _eval_rewrite_as_cosh(self, arg):
-        return S.ImaginaryUnit*cosh(S.Pi*S.ImaginaryUnit/2 - arg)/cosh(arg)
-
-    def _eval_rewrite_as_coth(self, arg):
-        return 1/coth(arg)
-
-
     def _eval_is_real(self):
-    # RECHECK
         return self.args[0].is_real
 
 
@@ -458,8 +521,11 @@ class coth(HyperbolicFunction):
        L{asinh}, L{acsch}, L{acosh}, L{asech}, L{atanh}, L{acoth}
     """
 
+<<<<<<< HEAD
     nargs = 1
 
+=======
+>>>>>>> Finished rewrite rules for hyperbolic functions
     @classmethod
     def eval(cls, arg):
     # RECHECK
@@ -504,6 +570,7 @@ class coth(HyperbolicFunction):
             if arg.func == acoth:
                 return arg.args[0]
 
+
     @staticmethod
     @cacheit
     def taylor_term(n, x, *previous_terms):
@@ -532,6 +599,52 @@ class coth(HyperbolicFunction):
         return acoth
 
 
+    def _eval_rewrite_as_exp(self, arg):
+        neg_exp, pos_exp = C.exp(-arg), C.exp(arg)
+        return (pos_exp + neg_exp) / (pos_exp - neg_exp)
+
+    def _eval_rewrite_as_sinh(self, arg):
+        return -S.ImaginaryUnit*sinh(arg + S.Pi*S.ImaginaryUnit/2) / sinh(arg)
+
+    def _eval_rewrite_as_csch(self, arg):
+        return -S.ImaginaryUnit*csch(arg) / csch(arg + S.Pi*S.ImaginaryUnit/2)
+
+    def _eval_rewrite_as_cosh(self, arg):
+        return S.ImaginaryUnit*cosh(arg) / cosh(arg + S.Pi*S.ImaginaryUnit/2)
+
+    def _eval_rewrite_as_sech(self, arg):
+        return S.ImaginaryUnit*sech(arg + S.Pi*S.ImaginaryUnit/2) / sech(arg)
+
+    def _eval_rewrite_as_tanh(self, arg):
+        return 1 / tanh(arg)
+
+    def _eval_rewrite_as_sin(self, arg):
+        return S.ImaginaryUnit*C.sin(S.ImaginaryUnit*arg + S.Pi/2) / C.sin(S.ImaginaryUnit*arg)
+
+    def _eval_rewrite_as_csc(self, arg):
+        return S.ImaginaryUnit*C.csc(S.ImaginaryUnit*arg) / C.csc(S.ImaginaryUnit*arg + S.Pi/2)
+
+    def _eval_rewrite_as_cos(self, arg):
+        return -S.ImaginaryUnit*C.cos(S.ImaginaryUnit*arg) / C.cos(S.ImaginaryUnit*arg + S.Pi/2)
+
+    def _eval_rewrite_as_sec(self, arg):
+        return -S.ImaginaryUnit*C.sec(S.ImaginaryUnit*arg + S.Pi/2) / C.sec(S.ImaginaryUnit*arg)
+
+    def _eval_rewrite_as_tan(self, arg):
+        return S.ImaginaryUnit / C.tan(S.ImaginaryUnit*arg)
+
+    def _eval_rewrite_as_cot(self, arg):
+        return S.ImaginaryUnit*C.cot(S.ImaginaryUnit*arg)
+
+
+    def _eval_as_leading_term(self, x):
+        arg = self.args[0].as_leading_term(x)
+        if C.Order(1,x).contains(arg):
+            return 1/arg
+        else:
+            return self.func(arg)
+
+
     def _eval_conjugate(self):
         return self.func(self.args[0].conjugate())
 
@@ -551,27 +664,8 @@ class coth(HyperbolicFunction):
         return (sinh(re)*cosh(re)/denom, -C.sin(im)*C.cos(im)/denom)
 
 
-    # RECHECK ALL
-    def _eval_rewrite_as_exp(self, arg):
-        neg_exp, pos_exp = C.exp(-arg), C.exp(arg)
-        return (pos_exp+neg_exp)/(pos_exp-neg_exp)
-
-    def _eval_rewrite_as_sinh(self, arg):
-        return -S.ImaginaryUnit*sinh(S.Pi*S.ImaginaryUnit/2 - arg)/sinh(arg)
-
-    def _eval_rewrite_as_cosh(self, arg):
-        return -S.ImaginaryUnit*cosh(arg)/cosh(S.Pi*S.ImaginaryUnit/2 - arg)
-
-    def _eval_rewrite_as_tanh(self, arg):
-        return 1/tanh(arg)
-
-
-    def _eval_as_leading_term(self, x):
-        arg = self.args[0].as_leading_term(x)
-        if C.Order(1,x).contains(arg):
-            return 1/arg
-        else:
-            return self.func(arg)
+    def _eval_is_real(self):
+        return self.args[0].is_real
 
 
     def _sage_(self):
@@ -593,9 +687,6 @@ class sech(HyperbolicFunction):
        L{asinh}, L{acsch}, L{acosh}, L{asech}, L{atanh}, L{acoth}
     """
 
-    nargs = 1
-
-
     def fdiff(self, argindex=1):
         if argindex == 1:
             return -self*tanh(self.args[0])
@@ -605,6 +696,47 @@ class sech(HyperbolicFunction):
 
     def inverse(self, argindex=1):
         return asech
+
+
+    def _eval_rewrite_as_exp(self, arg):
+        return 2 / (C.exp(arg) + C.exp(-arg))
+
+    def _eval_rewrite_as_sinh(self, arg):
+        return 1 / C.sin(S.ImaginaryUnit*arg + S.Pi/2)
+
+    def _eval_rewrite_as_csch(self, arg):
+        return S.ImaginaryUnit*csch(arg + S.Pi*S.ImaginaryUnit/2)
+
+    def _eval_rewrite_as_cosh(self, arg):
+        return 1 / cosh(arg)
+
+    def _eval_rewrite_as_tanh(self, arg):
+        tanh_half_sq = tanh(S.Half*arg)**2
+        return (1 - tanh_half_sq) / (1 + tanh_half_sq)
+
+    def _eval_rewrite_as_coth(self, arg):
+        coth_half_sq = coth(S.Half*arg)**2
+        return (coth_haf_sq - 1) / ( coth_half_sq + 1)
+
+    def _eval_rewrite_as_sin(self, arg):
+        return 1 / C.sin(S.ImaginaryUnit*arg + S.Pi/2)
+
+    def _eval_rewrite_as_csc(self, arg):
+        return C.csc(S.ImaginaryUnit*arg + S.Pi/2)
+
+    def _eval_rewrite_as_cos(self, arg):
+        return 1 / C.cos(S.ImaginaryUnit*arg)
+
+    def _eval_rewrite_as_sec(self, arg):
+        return C.sec(S.ImaginaryUnit*arg)
+
+    def _eval_rewrite_as_tan(self, arg):
+        tan_half_sq = C.tan(S.ImaginaryUnit*S.Half*arg)**2
+        return (1 + tan_half_sq) / (1 - tanh_half_sq)
+
+    def _eval_rewrite_as_cot(self, arg):
+        cot_half_sq = C.cot(S.ImaginaryUnit*S.Half*arg)**2
+        return (cot_half_sq + 1) / (cot_half_sq - 1)
 
 
     def _eval_conjugate(self):
@@ -618,6 +750,10 @@ class sech(HyperbolicFunction):
             return S.One
         else:
             return self.func(arg)
+
+
+    def _eval_is_real(self):
+        return self.args[0].is_real
 
 
     def _sage_(self):
@@ -639,9 +775,6 @@ class csch(HyperbolicFunction):
        L{asinh}, L{acsch}, L{acosh}, L{asech}, L{atanh}, L{acoth}
     """
 
-    nargs = 1
-
-
     def fdiff(self, argindex=1):
         if argindex == 1:
             return -self*coth(self.args[0])
@@ -651,6 +784,47 @@ class csch(HyperbolicFunction):
 
     def inverse(self, argindex=1):
         return acsch
+
+
+    def _eval_rewrite_as_exp(self, arg):
+        return 2 / (C.exp(arg) - C.exp(-arg))
+
+    def _eval_rewrite_as_sinh(self, arg):
+        return 1 / sinh(arg)
+
+    def _eval_rewrite_as_cosh(self, arg):
+        return S.ImaginaryUnit / cosh(arg + S.Pi*S.ImaginaryUnit/2)
+
+    def _eval_rewrite_as_sech(self, arg):
+        return S.ImaginaryUnit*sech(arg + S.Pi*S.ImaginaryUnit/2)
+
+    def _eval_rewrite_as_tanh(self, arg):
+        tanh_half = tanh(S.Half*arg)
+        return (1 - tanh_half**2) / (2*tanh_half)
+
+    def _eval_rewrite_as_coth(self, arg):
+        coth_half = coth(S.Half*arg)
+        return (coth_half**2 - 1) / (2*coth_half)
+
+    def _eval_rewrite_as_sin(self, arg):
+        return S.ImaginaryUnit / C.sin(S.ImaginaryUnit*arg)
+
+    def _eval_rewrite_as_csc(self, arg):
+        return S.ImaginaryUnit*C.csc(S.ImaginaryUnit*arg)
+
+    def _eval_rewrite_as_cos(self, arg):
+        return -S.ImaginaryUnit / C.cos(S.ImaginaryUnit*arg + S.Pi/2)
+
+    def _eval_rewrite_as_sec(self, arg):
+        return -S.ImaginaryUnit*C.sec(S.ImaginaryUnit*arg + S.Pi/2)
+
+    def _eval_rewrite_as_tan(self, arg):
+        tan_half = C.tan(S.Half*S.ImaginaryUnit*arg)
+        return (S.ImaginaryUnit*tan_half**2 + S.ImaginaryUnit) / (2*tan_half)
+
+    def _eval_rewrite_as_cot(self, arg):
+        cot_half = C.cot(S.Half*S.ImaginaryUnit*arg)
+        return (S.ImaginaryUnit*cot_half**2 + S.ImaginaryUnit) / (2*cot_half)
 
 
     def _eval_conjugate(self):
@@ -665,6 +839,10 @@ class csch(HyperbolicFunction):
             return self.func(arg)
 
 
+    def _eval_is_real(self):
+        return self.args[0].is_real
+
+
     def _sage_(self):
         import sage.all as sage
         return sage.csch(self.args[0]._sage_())
@@ -675,7 +853,8 @@ class csch(HyperbolicFunction):
 
 class InverseHyperbolicFunction(Function):
     """Base class for inverse hyperbolic functions. """
-    pass
+
+    nargs = 1
 
 
 class asinh(InverseHyperbolicFunction):
@@ -691,9 +870,6 @@ class asinh(InverseHyperbolicFunction):
        L{sinh}, L{csch}, L{cosh}, L{sech}, L{tanh}, L{coth}
        L{acsch}, L{acosh}, L{asech}, L{atanh}, L{acoth}
     """
-
-    nargs = 1
-
 
     @classmethod
     def eval(cls, arg):
@@ -771,9 +947,6 @@ class acosh(InverseHyperbolicFunction):
        L{sinh}, L{csch}, L{cosh}, L{sech}, L{tanh}, L{coth}
        L{asinh}, L{acsch}, L{asech}, L{atanh}, L{acoth}
     """
-
-    nargs = 1
-
 
     @classmethod
     def eval(cls, arg):
@@ -883,9 +1056,6 @@ class atanh(InverseHyperbolicFunction):
        L{asinh}, L{acsch}, L{acosh}, L{asech}, L{acoth}
     """
 
-    nargs = 1
-
-
     @classmethod
     def eval(cls, arg):
     # RECHECK
@@ -955,9 +1125,6 @@ class acoth(InverseHyperbolicFunction):
        L{sinh}, L{csch}, L{cosh}, L{sech}, L{tanh}, L{coth}
        L{asinh}, L{acsch}, L{acosh}, L{asech}, L{atanh}
     """
-
-    nargs = 1
-
 
     @classmethod
     def eval(cls, arg):
@@ -1030,9 +1197,6 @@ class asech(InverseHyperbolicFunction):
        L{asinh}, L{acsch}, L{acosh}, L{atanh}, L{acoth}
     """
 
-    nargs = 1
-
-
     def _eval_as_leading_term(self, x):
         arg = self.args[0].as_leading_term(x)
         if C.Order(1,x).contains(arg):
@@ -1066,9 +1230,6 @@ class acsch(InverseHyperbolicFunction):
        L{sinh}, L{csch}, L{cosh}, L{sech}, L{tanh}, L{coth}
        L{asinh}, L{acosh}, L{asech}, L{atanh}, L{acoth}
     """
-
-    nargs = 1
-
 
     def _eval_as_leading_term(self, x):
         arg = self.args[0].as_leading_term(x)
