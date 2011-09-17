@@ -1561,16 +1561,10 @@ class asin(InverseTrigonometricFunction):
        L{acsc}, L{acos}, L{asec}, L{atan}, L{acot}
        L{sinh}, L{csch}, L{cosh}, L{sech}, L{tanh}, L{coth}
        L{asinh}, L{acsch}, L{acosh}, L{asech}, L{atanh}, L{acoth}
-
     """
 
     nargs = 1
 
-    def fdiff(self, argindex=1):
-        if argindex == 1:
-            return 1/sqrt(1 - self.args[0]**2)
-        else:
-            raise ArgumentIndexError(self, argindex)
 
     @classmethod
     def eval(cls, arg):
@@ -1640,14 +1634,11 @@ class asin(InverseTrigonometricFunction):
                 return R / F * x**n / n
 
 
-    def _eval_as_leading_term(self, x):
-    # RECHECK
-        arg = self.args[0].as_leading_term(x)
-
-        if C.Order(1,x).contains(arg):
-            return arg
+    def fdiff(self, argindex=1):
+        if argindex == 1:
+            return 1 / sqrt(1 - self.args[0]**2)
         else:
-            return self.func(arg)
+            raise ArgumentIndexError(self, argindex)
 
 
     # RECHECK ALL
@@ -1706,16 +1697,9 @@ class acos(InverseTrigonometricFunction):
        L{asin}, L{acsc}, L{asec}, L{atan}, L{acot}
        L{sinh}, L{csch}, L{cosh}, L{sech}, L{tanh}, L{coth}
        L{asinh}, L{acsch}, L{acosh}, L{asech}, L{atanh}, L{acoth}
-
     """
 
     nargs = 1
-
-    def fdiff(self, argindex=1):
-        if argindex == 1:
-            return -1/sqrt(1 - self.args[0]**2)
-        else:
-            raise ArgumentIndexError(self, argindex)
 
 
     @classmethod
@@ -1771,14 +1755,11 @@ class acos(InverseTrigonometricFunction):
                 return -R / F * x**n / n
 
 
-    def _eval_as_leading_term(self, x):
-    # RECHECK
-        arg = self.args[0].as_leading_term(x)
-
-        if C.Order(1,x).contains(arg):
-            return arg
+    def fdiff(self, argindex=1):
+        if argindex == 1:
+            return -1 / sqrt(1 - self.args[0]**2)
         else:
-            return self.func(arg)
+            raise ArgumentIndexError(self, argindex)
 
 
     def _eval_is_real(self):
@@ -1841,16 +1822,9 @@ class atan(InverseTrigonometricFunction):
        L{asin}, L{acsc}, L{acos}, L{asec}, L{acot}
        L{sinh}, L{csch}, L{cosh}, L{sech}, L{tanh}, L{coth}
        L{asinh}, L{acsch}, L{acosh}, L{asech}, L{atanh}, L{acoth}
-
     """
 
     nargs = 1
-
-    def fdiff(self, argindex=1):
-        if argindex == 1:
-            return 1/(1+self.args[0]**2)
-        else:
-            raise ArgumentIndexError(self, argindex)
 
 
     @classmethod
@@ -1909,14 +1883,11 @@ class atan(InverseTrigonometricFunction):
             return (-1)**((n-1)//2) * x**n / n
 
 
-    def _eval_as_leading_term(self, x):
-    # RECHECK
-        arg = self.args[0].as_leading_term(x)
-
-        if C.Order(1,x).contains(arg):
-            return arg
+    def fdiff(self, argindex=1):
+        if argindex == 1:
+            return 1 / (1+self.args[0]**2)
         else:
-            return self.func(arg)
+            raise ArgumentIndexError(self, argindex)
 
 
     def _eval_is_real(self):
@@ -1972,16 +1943,9 @@ class acot(InverseTrigonometricFunction):
        L{asin}, L{acsc}, L{acos}, L{asec}, L{atan}
        L{sinh}, L{csch}, L{cosh}, L{sech}, L{tanh}, L{coth}
        L{asinh}, L{acsch}, L{acosh}, L{asech}, L{atanh}, L{acoth}
-
     """
 
     nargs = 1
-
-    def fdiff(self, argindex=1):
-        if argindex == 1:
-            return -1 / (1+self.args[0]**2)
-        else:
-            raise ArgumentIndexError(self, argindex)
 
 
     @classmethod
@@ -2045,14 +2009,12 @@ class acot(InverseTrigonometricFunction):
             return (-1)**((n+1)//2) * x**n / n
 
 
-    def _eval_as_leading_term(self, x):
-    # RECHECK
-        arg = self.args[0].as_leading_term(x)
-
-        if C.Order(1,x).contains(arg):
-            return arg
+    def fdiff(self, argindex=1):
+        if argindex == 1:
+            return -1 / (1+self.args[0]**2)
         else:
-            return self.func(arg)
+            raise ArgumentIndexError(self, argindex)
+
 
     # RECHECK ALL
     def _eval_rewrite_as_log(self, arg):
@@ -2120,16 +2082,9 @@ class asec(InverseTrigonometricFunction):
        L{asin}, L{acsc}, L{acos}, L{atan}, L{acot}
        L{sinh}, L{csch}, L{cosh}, L{sech}, L{tanh}, L{coth}
        L{asinh}, L{acsch}, L{acosh}, L{asech}, L{atanh}, L{acoth}
-
     """
 
     nargs = 1
-
-    def fdiff(self, argindex=1):
-        if argindex == 1:
-            return 1 / (self.args[0]**2 * sqrt(1 - 1/self.args[0]**2))
-        else:
-            raise ArgumentIndexError(self, argindex)
 
 
     @classmethod
@@ -2185,12 +2140,17 @@ class asec(InverseTrigonometricFunction):
         #         return -R / F * x**n / n
 
 
-    def _eval_as_leading_term(self, x):
-    # RECHECK
-        arg = self.args[0].as_leading_term(x)
+    def fdiff(self, argindex=1):
+        if argindex == 1:
+            return 1 / (self.args[0]**2 * sqrt(1 - 1/self.args[0]**2))
+        else:
+            raise ArgumentIndexError(self, argindex)
 
+
+    def _eval_as_leading_term(self, x):
+        arg = self.args[0].as_leading_term(x)
         if C.Order(1,x).contains(arg):
-            return arg
+            return log(arg)
         else:
             return self.func(arg)
 
@@ -2249,16 +2209,9 @@ class acsc(InverseTrigonometricFunction):
        L{asin}, L{acos}, L{asec}, L{atan}, L{acot}
        L{sinh}, L{csch}, L{cosh}, L{sech}, L{tanh}, L{coth}
        L{asinh}, L{acsch}, L{acosh}, L{asech}, L{atanh}, L{acoth}
-
     """
 
     nargs = 1
-
-    def fdiff(self, argindex=1):
-        if argindex == 1:
-            return -1 / (self.args[0]**2 * sqrt(1 - 1/self.args[0]**2))
-        else:
-            raise ArgumentIndexError(self, argindex)
 
 
     @classmethod
@@ -2314,12 +2267,17 @@ class acsc(InverseTrigonometricFunction):
         #         return -R / F * x**n / n
 
 
-    def _eval_as_leading_term(self, x):
-    # RECHECK
-        arg = self.args[0].as_leading_term(x)
+    def fdiff(self, argindex=1):
+        if argindex == 1:
+            return -1 / (self.args[0]**2 * sqrt(1 - 1/self.args[0]**2))
+        else:
+            raise ArgumentIndexError(self, argindex)
 
+
+    def _eval_as_leading_term(self, x):
+        arg = self.args[0].as_leading_term(x)
         if C.Order(1,x).contains(arg):
-            return arg
+            return log(arg)
         else:
             return self.func(arg)
 
@@ -2366,7 +2324,6 @@ class atan2(Function):
        L{asin}, L{acsc}, L{acos}, L{asec}, L{atan}, L{acot}
        L{sinh}, L{csch}, L{cosh}, L{sech}, L{tanh}, L{coth}
        L{asinh}, L{acsch}, L{acosh}, L{asech}, L{atanh}, L{acoth}
-
     """
 
     nargs = 2
