@@ -138,16 +138,6 @@ class sinh(HyperbolicFunction):
         return 2*coth_half/(coth_half**2 - 1)
 
 
-    def _eval_as_leading_term(self, x):
-    # RECHECK
-        arg = self.args[0].as_leading_term(x)
-
-        if C.Order(1,x).contains(arg):
-            return S.One
-        else:
-            return self.func(arg)
-
-
     def _eval_is_real(self):
     # RECHECK
         return self.args[0].is_real
@@ -270,7 +260,6 @@ class cosh(HyperbolicFunction):
         return (cosh(re)*C.cos(im), sinh(re)*C.sin(im))
 
 
-
     def _eval_rewrite_as_exp(self, arg):
     # RECHECK
         return (C.exp(arg) + C.exp(-arg)) / 2
@@ -290,9 +279,7 @@ class cosh(HyperbolicFunction):
 
 
     def _eval_as_leading_term(self, x):
-    # RECHECK
         arg = self.args[0].as_leading_term(x)
-
         if C.Order(1,x).contains(arg):
             return S.One
         else:
@@ -440,16 +427,6 @@ class tanh(HyperbolicFunction):
         return 1/coth(arg)
 
 
-    def _eval_as_leading_term(self, x):
-    # RECHECK
-        arg = self.args[0].as_leading_term(x)
-
-        if C.Order(1,x).contains(arg):
-            return S.One
-        else:
-            return self.func(arg)
-
-
     def _eval_is_real(self):
     # RECHECK
         return self.args[0].is_real
@@ -590,13 +567,12 @@ class coth(HyperbolicFunction):
 
 
     def _eval_as_leading_term(self, x):
-    # RECHECK
         arg = self.args[0].as_leading_term(x)
-
         if C.Order(1,x).contains(arg):
-            return S.One
+            return 1/arg
         else:
             return self.func(arg)
+
 
     def _sage_(self):
         import sage.all as sage
@@ -633,6 +609,15 @@ class sech(HyperbolicFunction):
 
     def _eval_conjugate(self):
         return self.func(self.args[0].conjugate())
+
+
+    def _eval_as_leading_term(self, x):
+        arg = self.args[0].as_leading_term(x)
+
+        if C.Order(1,x).contains(arg):
+            return S.One
+        else:
+            return self.func(arg)
 
 
     def _sage_(self):
@@ -672,6 +657,14 @@ class csch(HyperbolicFunction):
         return self.func(self.args[0].conjugate())
 
 
+    def _eval_as_leading_term(self, x):
+        arg = self.args[0].as_leading_term(x)
+        if C.Order(1,x).contains(arg):
+            return 1/arg
+        else:
+            return self.func(arg)
+
+
     def _sage_(self):
         import sage.all as sage
         return sage.csch(self.args[0]._sage_())
@@ -683,7 +676,6 @@ class csch(HyperbolicFunction):
 class InverseHyperbolicFunction(Function):
     """Base class for inverse hyperbolic functions. """
     pass
-
 
 
 class asinh(InverseHyperbolicFunction):
@@ -699,14 +691,9 @@ class asinh(InverseHyperbolicFunction):
        L{sinh}, L{csch}, L{cosh}, L{sech}, L{tanh}, L{coth}
        L{acsch}, L{acosh}, L{asech}, L{atanh}, L{acoth}
     """
+
     nargs = 1
 
-    def fdiff(self, argindex=1):
-    # RECHECK
-        if argindex == 1:
-            return 1/sqrt(self.args[0]**2 + 1)
-        else:
-            raise ArgumentIndexError(self, argindex)
 
     @classmethod
     def eval(cls, arg):
@@ -759,14 +746,11 @@ class asinh(InverseHyperbolicFunction):
                 return (-1)**k * R / F * x**n / n
 
 
-    def _eval_as_leading_term(self, x):
-    # RECHECK
-        arg = self.args[0].as_leading_term(x)
-
-        if C.Order(1,x).contains(arg):
-            return arg
+    def fdiff(self, argindex=1):
+        if argindex == 1:
+            return 1 / sqrt(self.args[0]**2 + 1)
         else:
-            return self.func(arg)
+            raise ArgumentIndexError(self, argindex)
 
 
     def _sage_(self):
@@ -787,14 +771,8 @@ class acosh(InverseHyperbolicFunction):
        L{sinh}, L{csch}, L{cosh}, L{sech}, L{tanh}, L{coth}
        L{asinh}, L{acsch}, L{asech}, L{atanh}, L{acoth}
     """
-    nargs = 1
 
-    def fdiff(self, argindex=1):
-    # RECHECK
-        if argindex == 1:
-            return 1/sqrt(self.args[0]**2 - 1)
-        else:
-            raise ArgumentIndexError(self, argindex)
+    nargs = 1
 
 
     @classmethod
@@ -879,14 +857,11 @@ class acosh(InverseHyperbolicFunction):
                 return -R / F * S.ImaginaryUnit * x**n / n
 
 
-    def _eval_as_leading_term(self, x):
-    # RECHECK
-        arg = self.args[0].as_leading_term(x)
-
-        if C.Order(1,x).contains(arg):
-            return arg
+    def fdiff(self, argindex=1):
+        if argindex == 1:
+            return 1 / (sqrt(self.args[0] - 1)*sqrt(self.args[0] + 1))
         else:
-            return self.func(arg)
+            raise ArgumentIndexError(self, argindex)
 
 
     def _sage_(self):
@@ -907,14 +882,8 @@ class atanh(InverseHyperbolicFunction):
        L{sinh}, L{csch}, L{cosh}, L{sech}, L{tanh}, L{coth}
        L{asinh}, L{acsch}, L{acosh}, L{asech}, L{acoth}
     """
-    nargs = 1
 
-    def fdiff(self, argindex=1):
-    # RECHECK
-        if argindex == 1:
-            return 1/(1-self.args[0]**2)
-        else:
-            raise ArgumentIndexError(self, argindex)
+    nargs = 1
 
 
     @classmethod
@@ -961,14 +930,11 @@ class atanh(InverseHyperbolicFunction):
             return x**n / n
 
 
-    def _eval_as_leading_term(self, x):
-    # RECHECK
-        arg = self.args[0].as_leading_term(x)
-
-        if C.Order(1,x).contains(arg):
-            return arg
+    def fdiff(self, argindex=1):
+        if argindex == 1:
+            return 1 / (1-self.args[0]**2)
         else:
-            return self.func(arg)
+            raise ArgumentIndexError(self, argindex)
 
 
     def _sage_(self):
@@ -989,14 +955,8 @@ class acoth(InverseHyperbolicFunction):
        L{sinh}, L{csch}, L{cosh}, L{sech}, L{tanh}, L{coth}
        L{asinh}, L{acsch}, L{acosh}, L{asech}, L{atanh}
     """
-    nargs = 1
 
-    def fdiff(self, argindex=1):
-    # RECHECK
-        if argindex == 1:
-            return 1/(1-self.args[0]**2)
-        else:
-            raise ArgumentIndexError(self, argindex)
+    nargs = 1
 
 
     @classmethod
@@ -1044,14 +1004,11 @@ class acoth(InverseHyperbolicFunction):
             return x**n / n
 
 
-    def _eval_as_leading_term(self, x):
-    # RECHECK
-        arg = self.args[0].as_leading_term(x)
-
-        if C.Order(1,x).contains(arg):
-            return arg
+    def fdiff(self, argindex=1):
+        if argindex == 1:
+            return 1 / (1-self.args[0]**2)
         else:
-            return self.func(arg)
+            raise ArgumentIndexError(self, argindex)
 
 
     def _sage_(self):
@@ -1073,6 +1030,24 @@ class asech(InverseHyperbolicFunction):
        L{asinh}, L{acsch}, L{acosh}, L{atanh}, L{acoth}
     """
 
+    nargs = 1
+
+
+    def _eval_as_leading_term(self, x):
+        arg = self.args[0].as_leading_term(x)
+        if C.Order(1,x).contains(arg):
+            return log(arg)
+        else:
+            return self.func(arg)
+
+
+    def fdiff(self, argindex=1):
+        if argindex == 1:
+            return -1 / (sqrt(1-self.args[0]) * self.args[0]) * sqrt(1/(1+self.args[0]))
+        else:
+            raise ArgumentIndexError(self, argindex)
+
+
     def _sage_(self):
         import sage.all as sage
         return sage.arcsech(self.args[0]._sage_())
@@ -1091,6 +1066,24 @@ class acsch(InverseHyperbolicFunction):
        L{sinh}, L{csch}, L{cosh}, L{sech}, L{tanh}, L{coth}
        L{asinh}, L{acosh}, L{asech}, L{atanh}, L{acoth}
     """
+
+    nargs = 1
+
+
+    def _eval_as_leading_term(self, x):
+        arg = self.args[0].as_leading_term(x)
+        if C.Order(1,x).contains(arg):
+            return log(arg)
+        else:
+            return self.func(arg)
+
+
+    def fdiff(self, argindex=1):
+        if argindex == 1:
+            return -1 / (sqrt(1+1/self.args[0]**2) * self.args[0]**2)
+        else:
+            raise ArgumentIndexError(self, argindex)
+
 
     def _sage_(self):
         import sage.all as sage
