@@ -2150,7 +2150,7 @@ class asec(InverseTrigonometricFunction):
     def _eval_as_leading_term(self, x):
         arg = self.args[0].as_leading_term(x)
         if C.Order(1,x).contains(arg):
-            return log(arg)
+            return C.log(arg)
         else:
             return self.func(arg)
 
@@ -2277,7 +2277,7 @@ class acsc(InverseTrigonometricFunction):
     def _eval_as_leading_term(self, x):
         arg = self.args[0].as_leading_term(x)
         if C.Order(1,x).contains(arg):
-            return log(arg)
+            return C.log(arg)
         else:
             return self.func(arg)
 
