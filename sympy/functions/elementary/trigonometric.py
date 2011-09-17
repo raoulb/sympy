@@ -1157,14 +1157,10 @@ class sec(TrigonometricFunction):
         if n < 0 or n % 2 == 1:
             return S.Zero
         else:
-            x = sympify(x)
-
-            # a, b = ((n-1)//2), 2**(n+1)
-
-            # B = C.bernoulli(n+1)
-            # F = C.factorial(n+1)
-
-            # return (-1)**a * b*(b-1) * B/F * x**n
+            raise NotImplementedError("Euler numbers needed")
+            #x = sympify(x)
+            #k = n // 2
+            #return (-1)**k * C.euler(2*k) / C.factorial(2*k) * x**(2*k)
 
 
     def fdiff(self, argindex=1):
@@ -1400,18 +1396,14 @@ class csc(TrigonometricFunction):
     @staticmethod
     @cacheit
     def taylor_term(n, x, *previous_terms):
-    # RECHECK
-        if n < 0 or n % 2 == 0:
+        if n == 0:
+            return 1 / sympify(x)
+        elif n < 0 or n % 2 == 0:
             return S.Zero
         else:
             x = sympify(x)
-
-            # a, b = ((n-1)//2), 2**(n+1)
-
-            # B = C.bernoulli(n+1)
-            # F = C.factorial(n+1)
-
-            # return (-1)**a * b*(b-1) * B/F * x**n
+            k = n // 2 + 1
+            return (-1)**(k-1) * 2 * (2**(2*k-1)-1) * C.bernoulli(2*k) * x**(2*k-1) / C.factorial(2*k)
 
 
     def fdiff(self, argindex=1):
