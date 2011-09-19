@@ -256,6 +256,18 @@ class sin(TrigonometricFunction):
         return asin
 
 
+    def _eval_aseries(self, n, args0, x, logx):
+        if C.im(args0[0]) > 0:
+            return S.ImaginaryUnit * C.exp(-S.ImaginaryUnit*x) / 2
+        elif C.im(args0[0]) < 0:
+            return -S.ImaginaryUnit * C.exp(S.ImaginaryUnit*x) / 2
+        elif C.im(args0[0]) == 0:
+            # No asymptotic series expansion along the real line
+            return sin(x)
+        else:
+            return super(sin, self)._eval_aseries(n, args0, x, logx)
+
+
     def _eval_rewrite_as_exp(self, arg):
         exp, I = C.exp, S.ImaginaryUnit
         return (exp(arg*I) - exp(-arg*I)) / (2*I)
@@ -496,6 +508,18 @@ class cos(TrigonometricFunction):
         return acos
 
 
+    def _eval_aseries(self, n, args0, x, logx):
+        if C.im(args0[0]) > 0:
+            return C.exp(-S.ImaginaryUnit*x) / 2
+        elif C.im(args0[0]) < 0:
+            return C.exp(S.ImaginaryUnit*x) / 2
+        elif C.im(args0[0]) == 0:
+            # No asymptotic series expansion along the real line
+            return cos(x)
+        else:
+            return super(cos, self)._eval_aseries(n, args0, x, logx)
+
+
     def _eval_rewrite_as_exp(self, arg):
         exp, I = C.exp, S.ImaginaryUnit
         return (exp(arg*I) + exp(-arg*I)) / 2
@@ -734,6 +758,18 @@ class tan(TrigonometricFunction):
         return tan(argnew)
 
 
+    def _eval_aseries(self, n, args0, x, logx):
+        if C.im(args0[0]) > 0:
+            return S.ImaginaryUnit - 2*S.ImaginaryUnit*C.exp(2*S.ImaginaryUnit*x)*C.hyper([1],[],-C.exp(2*S.ImaginaryUnit*x))
+        elif C.im(args0[0]) < 0:
+            return -S.ImaginaryUnit + 2*S.ImaginaryUnit*C.exp(-2*S.ImaginaryUnit*x)*C.hyper([1],[],-C.exp(-2*S.ImaginaryUnit*x))
+        elif C.im(args0[0]) == 0:
+            # No asymptotic series expansion along the real line
+            return tan(x)
+        else:
+            return super(tan, self)._eval_aseries(n, args0, x, logx)
+
+
     def _eval_nseries(self, x, n, logx):
     # RECHECK
         i = self.args[0].limit(x, 0)*2/S.Pi
@@ -943,6 +979,18 @@ class cot(TrigonometricFunction):
         if arg != argnew and (argnew/S.Pi).is_integer:
             return S.NaN
         return cot(argnew)
+
+
+    def _eval_aseries(self, n, args0, x, logx):
+        if C.im(args0[0]) > 0:
+            return -S.ImaginaryUnit - 2*S.ImaginaryUnit*C.exp(2*S.ImaginaryUnit*x)*C.hyper([1],[],C.exp(2*S.ImaginaryUnit*x))
+        elif C.im(args0[0]) < 0:
+            return S.ImaginaryUnit + 2*S.ImaginaryUnit*C.exp(-2*S.ImaginaryUnit*x)*C.hyper([1],[],C.exp(-2*S.ImaginaryUnit*x))
+        elif C.im(args0[0]) == 0:
+            # No asymptotic series expansion along the real line
+            return cot(x)
+        else:
+            return super(cot, self)._eval_aseries(n, args0, x, logx)
 
 
     def _eval_nseries(self, x, n, logx):
@@ -1182,6 +1230,18 @@ class sec(TrigonometricFunction):
         # if arg != argnew and (argnew/(S.Pi/2)).is_odd:
         #     return S.NaN
         # return tan(argnew)
+
+
+    def _eval_aseries(self, n, args0, x, logx):
+        if C.im(args0[0]) > 0:
+            return 2*C.exp(S.ImaginaryUnit*x)*C.hyper([1],[],-C.exp(2*S.ImaginaryUnit*x))
+        elif C.im(args0[0]) < 0:
+            return 2*C.exp(-S.ImaginaryUnit*x)*C.hyper([1],[],-C.exp(-2*S.ImaginaryUnit*x))
+        elif C.im(args0[0]) == 0:
+            # No asymptotic series expansion along the real line
+            return sec(x)
+        else:
+            return super(sec, self)._eval_aseries(n, args0, x, logx)
 
 
     def _eval_nseries(self, x, n, logx):
@@ -1426,6 +1486,18 @@ class csc(TrigonometricFunction):
         # if arg != argnew and (argnew/(S.Pi/2)).is_odd:
         #     return S.NaN
         # return tan(argnew)
+
+
+    def _eval_aseries(self, n, args0, x, logx):
+        if C.im(args0[0]) > 0:
+            return -2*S.ImaginaryUnit*C.exp(S.ImaginaryUnit*x)*C.hyper([1],[],C.exp(2*S.ImaginaryUnit*x))
+        elif C.im(args0[0]) < 0:
+            return 2*S.ImaginaryUnit*C.exp(-S.ImaginaryUnit*x)*C.hyper([1],[],C.exp(-2*S.ImaginaryUnit*x))
+        elif C.im(args0[0]) == 0:
+            # No asymptotic series expansion along the real line
+            return csc(x)
+        else:
+            return super(csc, self)._eval_aseries(n, args0, x, logx)
 
 
     def _eval_nseries(self, x, n, logx):

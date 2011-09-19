@@ -96,6 +96,15 @@ class sinh(HyperbolicFunction):
         return asinh
 
 
+    def _eval_aseries(self, n, args0, x, logx):
+        if args0[0] == S.Infinity:
+            return C.exp(x) / 2
+        elif args0[0] == S.NegativeInfinity:
+            return -C.exp(-x) / 2
+        else:
+            return super(sinh, self)._eval_aseries(n, args0, x, logx)
+
+
     def _eval_rewrite_as_exp(self, arg):
         return (C.exp(arg) - C.exp(-arg)) / 2
 
@@ -244,6 +253,15 @@ class cosh(HyperbolicFunction):
 
     def inverse(self, argindex=1):
         return acosh
+
+
+    def _eval_aseries(self, n, args0, x, logx):
+        if args0[0] == S.Infinity:
+            return C.exp(x) / 2
+        elif args0[0] == S.NegativeInfinity:
+            return C.exp(-x) / 2
+        else:
+            return super(cosh, self)._eval_aseries(n, args0, x, logx)
 
 
     def _eval_rewrite_as_exp(self, arg):
@@ -409,6 +427,15 @@ class tanh(HyperbolicFunction):
         return atanh
 
 
+    def _eval_aseries(self, n, args0, x, logx):
+        if args0[0] == S.Infinity:
+            return S.One - 2*C.exp(-2*x)*C.hyper([1],[],-C.exp(-2*x))
+        elif args0[0] == S.NegativeInfinity:
+            return -S.One + 2*C.exp(2*x)*C.hyper([1],[],-C.exp(2*x))
+        else:
+            return super(tanh, self)._eval_aseries(n, args0, x, logx)
+
+
     def _eval_rewrite_as_exp(self, arg):
         neg_exp, pos_exp = C.exp(-arg), C.exp(arg)
         return (pos_exp - neg_exp) / (pos_exp + neg_exp)
@@ -570,6 +597,15 @@ class coth(HyperbolicFunction):
         return acoth
 
 
+    def _eval_aseries(self, n, args0, x, logx):
+        if args0[0] == S.Infinity:
+            return S.One + 2*C.exp(-2*x)*C.hyper([1],[],C.exp(-2*x))
+        elif args0[0] == S.NegativeInfinity:
+            return -S.One - 2*C.exp(2*x)*C.hyper([1],[],C.exp(2*x))
+        else:
+            return super(coth, self)._eval_aseries(n, args0, x, logx)
+
+
     def _eval_rewrite_as_exp(self, arg):
         neg_exp, pos_exp = C.exp(-arg), C.exp(arg)
         return (pos_exp + neg_exp) / (pos_exp - neg_exp)
@@ -685,6 +721,15 @@ class sech(HyperbolicFunction):
         return asech
 
 
+    def _eval_aseries(self, n, args0, x, logx):
+        if args0[0] == S.Infinity:
+            return 2*C.exp(-x)*C.hyper([1],[],-C.exp(-2*x))
+        elif args0[0] == S.NegativeInfinity:
+            return 2*C.exp(x)*C.hyper([1],[],-C.exp(2*x))
+        else:
+            return super(sech, self)._eval_aseries(n, args0, x, logx)
+
+
     def _eval_rewrite_as_exp(self, arg):
         return 2 / (C.exp(arg) + C.exp(-arg))
 
@@ -790,6 +835,15 @@ class csch(HyperbolicFunction):
 
     def inverse(self, argindex=1):
         return acsch
+
+
+    def _eval_aseries(self, n, args0, x, logx):
+        if args0[0] == S.Infinity:
+            return 2*C.exp(-x)*C.hyper([1],[],C.exp(-2*x))
+        elif args0[0] == S.NegativeInfinity:
+            return -2*C.exp(x)*C.hyper([1],[],C.exp(2*x))
+        else:
+            return super(csch, self)._eval_aseries(n, args0, x, logx)
 
 
     def _eval_rewrite_as_exp(self, arg):
