@@ -101,6 +101,9 @@ class sinh(HyperbolicFunction):
             return C.exp(x) / 2
         elif args0[0] == S.NegativeInfinity:
             return -C.exp(-x) / 2
+        elif C.re(args0[0]) == 0:
+            # No asymptotic series expansion along the imaginary line
+            return sinh(x)
         else:
             return super(sinh, self)._eval_aseries(n, args0, x, logx)
 
@@ -260,6 +263,9 @@ class cosh(HyperbolicFunction):
             return C.exp(x) / 2
         elif args0[0] == S.NegativeInfinity:
             return C.exp(-x) / 2
+        elif C.re(args0[0]) == 0:
+            # No asymptotic series expansion along the imaginary line
+            return cosh(x)
         else:
             return super(cosh, self)._eval_aseries(n, args0, x, logx)
 
@@ -432,6 +438,9 @@ class tanh(HyperbolicFunction):
             return S.One - 2*C.exp(-2*x)*C.hyper([1],[],-C.exp(-2*x))
         elif args0[0] == S.NegativeInfinity:
             return -S.One + 2*C.exp(2*x)*C.hyper([1],[],-C.exp(2*x))
+        elif C.re(args0[0]) == 0:
+            # No asymptotic series expansion along the imaginary line
+            return tanh(x)
         else:
             return super(tanh, self)._eval_aseries(n, args0, x, logx)
 
@@ -602,6 +611,9 @@ class coth(HyperbolicFunction):
             return S.One + 2*C.exp(-2*x)*C.hyper([1],[],C.exp(-2*x))
         elif args0[0] == S.NegativeInfinity:
             return -S.One - 2*C.exp(2*x)*C.hyper([1],[],C.exp(2*x))
+        elif C.re(args0[0]) == 0:
+            # No asymptotic series expansion along the imaginary line
+            return coth(x)
         else:
             return super(coth, self)._eval_aseries(n, args0, x, logx)
 
@@ -726,6 +738,9 @@ class sech(HyperbolicFunction):
             return 2*C.exp(-x)*C.hyper([1],[],-C.exp(-2*x))
         elif args0[0] == S.NegativeInfinity:
             return 2*C.exp(x)*C.hyper([1],[],-C.exp(2*x))
+        elif C.re(args0[0]) == 0:
+            # No asymptotic series expansion along the imaginary line
+            return sech(x)
         else:
             return super(sech, self)._eval_aseries(n, args0, x, logx)
 
@@ -842,6 +857,9 @@ class csch(HyperbolicFunction):
             return 2*C.exp(-x)*C.hyper([1],[],C.exp(-2*x))
         elif args0[0] == S.NegativeInfinity:
             return -2*C.exp(x)*C.hyper([1],[],C.exp(2*x))
+        elif C.re(args0[0]) == 0:
+            # No asymptotic series expansion along the imaginary line
+            return csch(x)
         else:
             return super(csch, self)._eval_aseries(n, args0, x, logx)
 
