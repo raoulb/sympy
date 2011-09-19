@@ -15,7 +15,5 @@ for f in funcs:
         print("-"*len(t))
         print(t)
 
-        try:
-            print(pretty(f(x)._eval_aseries(10, [p], x, None)))
-        except PoleError:
-            print("Not implemented")
+        print(pretty(f(x)._eval_aseries(10, [p], x, None)))
+
