@@ -1156,10 +1156,9 @@ class sec(TrigonometricFunction):
         if n < 0 or n % 2 == 1:
             return S.Zero
         else:
-            raise NotImplementedError("Euler numbers needed")
-            #x = sympify(x)
-            #k = n // 2
-            #return (-1)**k * C.euler(2*k) / C.factorial(2*k) * x**(2*k)
+            x = sympify(x)
+            k = n // 2
+            return (-1)**k * C.euler(2*k) / C.factorial(2*k) * x**(2*k)
 
 
     def fdiff(self, argindex=1):

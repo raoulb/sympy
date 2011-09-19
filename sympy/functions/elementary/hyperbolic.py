@@ -78,17 +78,11 @@ class sinh(HyperbolicFunction):
     @staticmethod
     @cacheit
     def taylor_term(n, x, *previous_terms):
-    # RECHECK
         if n < 0 or n % 2 == 0:
             return S.Zero
         else:
             x = sympify(x)
-
-            if len(previous_terms) > 2:
-                p = previous_terms[-2]
-                return p * x**2 / (n*(n-1))
-            else:
-                return x**(n) / C.factorial(n)
+            return x**n / C.factorial(n)
 
 
     def fdiff(self, argindex=1):
@@ -167,10 +161,7 @@ class sinh(HyperbolicFunction):
 
 
     def _eval_is_bounded(self):
-    # RECHECK
-        arg = self.args[0]
-        if arg.is_imaginary:
-            return True
+        return False
 
 
     def _sage_(self):
@@ -237,17 +228,11 @@ class cosh(HyperbolicFunction):
     @staticmethod
     @cacheit
     def taylor_term(n, x, *previous_terms):
-    # RECHECK
         if n < 0 or n % 2 == 1:
             return S.Zero
         else:
             x = sympify(x)
-
-            if len(previous_terms) > 2:
-                p = previous_terms[-2]
-                return p * x**2 / (n*(n-1))
-            else:
-                return x**(n)/C.factorial(n)
+            return x**n / C.factorial(n)
 
 
     def fdiff(self, argindex=1):
@@ -335,10 +320,7 @@ class cosh(HyperbolicFunction):
 
 
     def _eval_is_bounded(self):
-    # RECHECK
-        arg = self.args[0]
-        if arg.is_imaginary:
-            return True
+        return False
 
 
     def _sage_(self):
@@ -408,18 +390,12 @@ class tanh(HyperbolicFunction):
     @staticmethod
     @cacheit
     def taylor_term(n, x, *previous_terms):
-    # RECHECK
         if n < 0 or n % 2 == 0:
             return S.Zero
         else:
             x = sympify(x)
-
-            a = 2**(n+1)
-
-            B = C.bernoulli(n+1)
-            F = C.factorial(n+1)
-
-            return a*(a-1) * B/F * x**n
+            k = n // 2 + 1
+            return 2**(2*k) * (2**(2*k)-1) * C.bernoulli(2*k) / C.factorial(2*k) * x**(2*k-1)
 
 
     def fdiff(self, argindex=1):
@@ -496,7 +472,6 @@ class tanh(HyperbolicFunction):
 
 
     def _eval_is_bounded(self):
-    # RECHECK
         arg = self.args[0]
         if arg.is_real:
             return True
@@ -574,18 +549,14 @@ class coth(HyperbolicFunction):
     @staticmethod
     @cacheit
     def taylor_term(n, x, *previous_terms):
-    # RECHECK
         if n == 0:
             return 1 / sympify(x)
         elif n < 0 or n % 2 == 0:
             return S.Zero
         else:
             x = sympify(x)
-
-            B = C.bernoulli(n+1)
-            F = C.factorial(n+1)
-
-            return 2**(n+1) * B/F * x**n
+            k = n // 2 + 1
+            return 2**(2*k) * C.bernoulli(2*k) / C.factorial(2*k) * x**(2*k-1)
 
 
     def fdiff(self, argindex=1):
@@ -668,6 +639,11 @@ class coth(HyperbolicFunction):
         return self.args[0].is_real
 
 
+    def _eval_is_bounded(self):
+        # Bounded for x in C with Re x != 0
+        return False
+
+
     def _sage_(self):
         import sage.all as sage
         return sage.coth(self.args[0]._sage_())
@@ -686,6 +662,17 @@ class sech(HyperbolicFunction):
        L{sinh}, L{csch}, L{cosh}, L{tanh}, L{coth}
        L{asinh}, L{acsch}, L{acosh}, L{asech}, L{atanh}, L{acoth}
     """
+
+    @staticmethod
+    @cacheit
+    def taylor_term(n, x, *previous_terms):
+        if n < 0 or n % 2 == 1:
+            return S.Zero
+        else:
+            x = sympify(x)
+            k = n // 2
+            return C.euler(2*k) / C.factorial(2*k) * x**(2*k)
+
 
     def fdiff(self, argindex=1):
         if argindex == 1:
@@ -756,6 +743,12 @@ class sech(HyperbolicFunction):
         return self.args[0].is_real
 
 
+    def _eval_is_bounded(self):
+        arg = self.args[0]
+        if arg.is_real:
+            return True
+
+
     def _sage_(self):
         import sage.all as sage
         return sage.sech(self.args[0]._sage_())
@@ -774,6 +767,19 @@ class csch(HyperbolicFunction):
        L{sinh}, L{cosh}, L{sech}, L{tanh}, L{coth}
        L{asinh}, L{acsch}, L{acosh}, L{asech}, L{atanh}, L{acoth}
     """
+
+    @staticmethod
+    @cacheit
+    def taylor_term(n, x, *previous_terms):
+        if n == 0:
+            return 1 / sympify(x)
+        elif n < 0 or n % 2 == 0:
+            return S.Zero
+        else:
+            x = sympify(x)
+            k = n // 2 + 1
+            return -2 * (2**(2*k-1)-1) * C.bernoulli(2*k) / C.factorial(2*k) * x**(2*k-1)
+
 
     def fdiff(self, argindex=1):
         if argindex == 1:
@@ -841,6 +847,11 @@ class csch(HyperbolicFunction):
 
     def _eval_is_real(self):
         return self.args[0].is_real
+
+
+    def _eval_is_bounded(self):
+        # Bounded for x in C with Re x != 0
+        return False
 
 
     def _sage_(self):
