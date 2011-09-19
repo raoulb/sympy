@@ -284,7 +284,7 @@ class sin(TrigonometricFunction):
         return -S.ImaginaryUnit / C.csch(S.ImaginaryUnit*arg)
 
     def _eval_rewrite_as_cosh(self, arg):
-        return -cosh(S.ImaginaryUnit*arg + S.ImaginaryUnit*S.Pi/2)
+        return -C.cosh(S.ImaginaryUnit*arg + S.ImaginaryUnit*S.Pi/2)
 
     def _eval_rewrite_as_sech(self, arg):
         return -1 / C.sech(S.ImaginaryUnit*arg + S.ImaginaryUnit*S.Pi/2)
@@ -313,7 +313,7 @@ class sin(TrigonometricFunction):
             re, im = self.args[0].expand(deep, **hints).as_real_imag()
         else:
             re, im = self.args[0].as_real_imag()
-        return (sin(re)*cosh(im), cos(re)*C.sinh(im))
+        return (sin(re)*C.cosh(im), cos(re)*C.sinh(im))
 
 
     def _eval_expand_trig(self, deep=True, **hints):
@@ -524,7 +524,7 @@ class cos(TrigonometricFunction):
         return -S.ImaginaryUnit / C.csch(S.ImaginaryUnit*arg + S.ImaginaryUnit*S.Pi/2)
 
     def _eval_rewrite_as_cosh(self, arg):
-        return cosh(S.ImaginaryUnit*arg)
+        return C.cosh(S.ImaginaryUnit*arg)
 
     def _eval_rewrite_as_sech(self, arg):
         return 1 / C.sech(S.ImaginaryUnit*arg)
@@ -553,7 +553,7 @@ class cos(TrigonometricFunction):
             re, im = self.args[0].expand(deep, **hints).as_real_imag()
         else:
             re, im = self.args[0].as_real_imag()
-        return (cos(re)*cosh(im), -sin(re)*C.sinh(im))
+        return (cos(re)*C.cosh(im), -sin(re)*C.sinh(im))
 
 
     def _eval_expand_trig(self, deep=True, **hints):
@@ -769,7 +769,7 @@ class tan(TrigonometricFunction):
         return scsh(S.ImaginaryUnit*arg + S.ImaginaryUnit*S.Pi/2) / C.csch(S.ImaginaryUnit*arg)
 
     def _eval_rewrite_as_cosh(self, arg):
-        return -(S.ImaginaryUnit*arg + S.ImaginaryUnit*S.Pi/2) / cosh(S.ImaginaryUnit*arg)
+        return -(S.ImaginaryUnit*arg + S.ImaginaryUnit*S.Pi/2) / C.cosh(S.ImaginaryUnit*arg)
 
     def _eval_rewrite_as_sech(self, arg):
         return -C.sech(S.ImaginaryUnit*arg) / (S.ImaginaryUnit*arg + S.ImaginaryUnit*S.Pi/2)
@@ -796,7 +796,7 @@ class tan(TrigonometricFunction):
             re, im = self.args[0].expand(deep, **hints).as_real_imag()
         else:
             re, im = self.args[0].as_real_imag()
-        denom = cos(2*re) + cosh(2*im)
+        denom = cos(2*re) + C.cosh(2*im)
         return (sin(2*re)/denom, C.sinh(2*im)/denom)
 
 
@@ -1015,7 +1015,7 @@ class cot(TrigonometricFunction):
             re, im = self.args[0].expand(deep, **hints).as_real_imag()
         else:
             re, im = self.args[0].as_real_imag()
-        denom = cos(2*re) - cosh(2*im)
+        denom = cos(2*re) - C.cosh(2*im)
         return (-sin(2*re)/denom, C.sinh(2*im)/denom)
 
 
@@ -1221,7 +1221,7 @@ class sec(TrigonometricFunction):
         return S.ImaginaryUnit*C.csch(S.ImaginaryUnit*arg + S.ImaginaryUnit*S.Pi/2)
 
     def _eval_rewrite_as_cosh(self, arg):
-        return 1 / cosh(S.ImaginaryUnit*arg)
+        return 1 / C.cosh(S.ImaginaryUnit*arg)
 
     def _eval_rewrite_as_sech(self, arg):
         return C.sech(S.ImaginaryUnit*arg)
@@ -1259,8 +1259,8 @@ class sec(TrigonometricFunction):
             re, im = self.args[0].expand(deep, **hints).as_real_imag()
         else:
             re, im = self.args[0].as_real_imag()
-        denom = cos(2*re) + cosh(2*im)
-        return (2*cos(re)*cosh(im)/denom, 2*sin(re)*C.sinh(im)/denom)
+        denom = cos(2*re) + C.cosh(2*im)
+        return (2*cos(re)*C.cosh(im)/denom, 2*sin(re)*C.sinh(im)/denom)
 
 
     def _eval_expand_trig(self, deep=True, **hints):
@@ -1465,7 +1465,7 @@ class csc(TrigonometricFunction):
         return S.ImaginaryUnit * C.csch(S.ImaginaryUnit*arg)
 
     def _eval_rewrite_as_cosh(self, arg):
-        return -1 / cosh(S.ImaginaryUnit*arg + S.ImaginaryUnit*S.Pi/2)
+        return -1 / C.cosh(S.ImaginaryUnit*arg + S.ImaginaryUnit*S.Pi/2)
 
     def _eval_rewrite_as_sech(self, arg):
         return -C.sech(S.ImaginaryUnit*arg + S.ImaginaryUnit*S.Pi/2)
@@ -1502,8 +1502,8 @@ class csc(TrigonometricFunction):
             re, im = self.args[0].expand(deep, **hints).as_real_imag()
         else:
             re, im = self.args[0].as_real_imag()
-        denom = cos(2*re) - cosh(2*im)
-        return (-2*sin(re)*cosh(im)/denom, 2*cos(re)*C.sinh(im)/denom)
+        denom = cos(2*re) - C.cosh(2*im)
+        return (-2*sin(re)*C.cosh(im)/denom, 2*cos(re)*C.sinh(im)/denom)
 
 
     def _eval_expand_trig(self, deep=True, **hints):
