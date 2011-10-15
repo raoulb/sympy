@@ -532,11 +532,6 @@ class coth(HyperbolicFunction):
        L{asinh}, L{acsch}, L{acosh}, L{asech}, L{atanh}, L{acoth}
     """
 
-<<<<<<< HEAD
-    nargs = 1
-
-=======
->>>>>>> Finished rewrite rules for hyperbolic functions
     @classmethod
     def eval(cls, arg):
     # RECHECK
