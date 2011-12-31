@@ -1307,7 +1307,12 @@ class csc(TrigonometricFunction):
 ########################### TRIGONOMETRIC INVERSES ############################
 ###############################################################################
 
-class asin(Function):
+class InverseTrigonometricFunction(Function):
+    """Base class for inverse trigonometric functions."""
+    nargs = 1
+
+
+class asin(InverseTrigonometricFunction):
     """
     asin(x) -> Returns the arc sine of x (measured in radians)
 
@@ -1423,7 +1428,7 @@ class asin(Function):
         import sage.all as sage
         return sage.asin(self.args[0]._sage_())
 
-class acos(Function):
+class acos(InverseTrigonometricFunction):
     """
     acos(x) -> Returns the arc cosine of x (measured in radians)
 
@@ -1530,7 +1535,7 @@ class acos(Function):
         import sage.all as sage
         return sage.acos(self.args[0]._sage_())
 
-class atan(Function):
+class atan(InverseTrigonometricFunction):
     """
     atan(x) -> Returns the arc tangent of x (measured in radians)
 
@@ -1641,7 +1646,7 @@ class atan(Function):
         import sage.all as sage
         return sage.atan(self.args[0]._sage_())
 
-class acot(Function):
+class acot(InverseTrigonometricFunction):
     """
     acot(x) -> Returns the arc cotangent of x (measured in radians)
     """
@@ -1738,7 +1743,7 @@ class acot(Function):
         return S.ImaginaryUnit/2 * \
                (C.log((x - S.ImaginaryUnit)/(x + S.ImaginaryUnit)))
 
-class atan2(Function):
+class atan2(InverseTrigonometricFunction):
     """
     atan2(y,x) -> Returns the atan(y/x) taking two arguments y and x.
     Signs of both y and x are considered to determine the appropriate
