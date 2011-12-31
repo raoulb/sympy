@@ -783,21 +783,34 @@ class tan(TrigonometricFunction):
 class cot(TrigonometricFunction):
     """
     cot(x) -> Returns the cotangent of x (measured in radians)
+
+    Notes
+    =====
+
+    * cot(x) will evaluate automatically in the case x is a
+      multiple of pi.
+
+    Examples
+    ========
+    >>> from sympy import cot
+    >>> from sympy.abc import x
+    >>> cot(x**2).diff(x)
+    2*x*(-cot(x**2)**2 - 1)
+    >>> cot(1).diff(x)
+    0
+
+    See Also
+    ========
+
+    L{sin}, L{csc}, L{cos}, L{sec}, L{tan}
+    L{asin}, L{acsc}, L{acos}, L{asec}, L{atan}, L{acot}
+
+    References
+    ==========
+
+    U{Definitions in trigonometry<http://planetmath.org/encyclopedia/DefinitionsInTrigonometry.html>}
+
     """
-
-    nargs = 1
-
-    def fdiff(self, argindex=1):
-        if argindex == 1:
-            return S.NegativeOne - self**2
-        else:
-            raise ArgumentIndexError(self, argindex)
-
-    def inverse(self, argindex=1):
-        """
-        Return the inverse of this function.
-        """
-        return acot
 
     @classmethod
     def eval(cls, arg):
@@ -869,6 +882,17 @@ class cot(TrigonometricFunction):
             x = arg.args[0]
             return x / sqrt(1 - x**2)
 
+    def fdiff(self, argindex=1):
+        if argindex == 1:
+            return -csc(self.args[0])**2
+        else:
+            raise ArgumentIndexError(self, argindex)
+
+    def inverse(self, argindex=1):
+        """
+        Return the inverse of this function.
+        """
+        return acot
 
     @staticmethod
     @cacheit
@@ -879,11 +903,19 @@ class cot(TrigonometricFunction):
             return S.Zero
         else:
             x = sympify(x)
+            k = n // 2 + 1
+            return (-1)**k * 2**(2*k) * C.bernoulli(2*k) / C.factorial(2*k) * x**(2*k-1)
 
-            B = C.bernoulli(n+1)
-            F = C.factorial(n+1)
-
-            return (-1)**((n+1)//2) * 2**(n+1) * B/F * x**n
+    def _eval_aseries(self, n, args0, x, logx):
+        if C.im(args0[0]) > 0:
+            return -S.ImaginaryUnit - 2*S.ImaginaryUnit*C.exp(2*S.ImaginaryUnit*x)*C.hyper([1],[],C.exp(2*S.ImaginaryUnit*x))
+        elif C.im(args0[0]) < 0:
+            return S.ImaginaryUnit + 2*S.ImaginaryUnit*C.exp(-2*S.ImaginaryUnit*x)*C.hyper([1],[],C.exp(-2*S.ImaginaryUnit*x))
+        elif C.im(args0[0]) == 0:
+            # No asymptotic series expansion along the real line
+            return cot(x)
+        else:
+            return super(cot, self)._eval_aseries(n, args0, x, logx)
 
     def _eval_nseries(self, x, n, logx):
         i = self.args[0].limit(x, 0)/S.Pi
@@ -892,7 +924,6 @@ class cot(TrigonometricFunction):
         return Function._eval_nseries(self, x, n=n, logx=logx)
 
     def _eval_conjugate(self):
-        assert len(self.args) == 1
         return self.func(self.args[0].conjugate())
 
     def as_real_imag(self, deep=True, **hints):
@@ -909,23 +940,25 @@ class cot(TrigonometricFunction):
         denom = sin(re)**2 + C.sinh(im)**2
         return (sin(re)*cos(re)/denom, -C.sinh(im)*C.cosh(im)/denom)
 
-    def _eval_expand_complex(self, deep=True, **hints):
-        re_part, im_part = self.as_real_imag(deep=deep, **hints)
-        return re_part + im_part*S.ImaginaryUnit
-
     def _eval_rewrite_as_exp(self, arg):
         exp, I = C.exp, S.ImaginaryUnit
         neg_exp, pos_exp = exp(-arg*I), exp(arg*I)
         return I*(pos_exp+neg_exp)/(pos_exp-neg_exp)
 
-    def _eval_rewrite_as_sin(self, x):
-        return 2*sin(2*x)/sin(x)**2
+    def _eval_rewrite_as_sin(self, arg):
+        return sin(arg + S.Pi/2) / sin(arg)
 
-    def _eval_rewrite_as_cos(self, x):
-        return -cos(x)/cos(x + S.Pi/2)
+    def _eval_rewrite_as_cos(self, arg):
+        return -cos(arg) / cos(arg + S.Pi/2)
 
     def _eval_rewrite_as_tan(self, arg):
         return 1/tan(arg)
+
+    def _eval_rewrite_as_sec(self, arg):
+        return sec(arg + S.Pi/2) / sec(arg)
+
+    def _eval_rewrite_as_csc(self, arg):
+        return csc(arg) / csc(arg + S.Pi/2)
 
     def _eval_as_leading_term(self, x):
         arg = self.args[0].as_leading_term(x)
@@ -937,6 +970,11 @@ class cot(TrigonometricFunction):
 
     def _eval_is_real(self):
         return self.args[0].is_real
+
+    def _eval_is_bounded(self):
+        arg = self.args[0]
+        if arg.is_imaginary:
+            return True
 
     def _eval_subs(self, old, new):
         if self == old:
