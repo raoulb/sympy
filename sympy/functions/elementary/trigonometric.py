@@ -844,6 +844,7 @@ class cot(TrigonometricFunction):
 
     trules = {}
     trules["addition"] = lambda a,b: (cot(a)*cot(b)-1)/(cot(a)*cot(b))
+    trules["multiarg"] = lambda n,z,k: (-1)**(n-1) / (cot(z)**((-1)**n) * C.Sum((-1)**k*C.binomial(n,2*C.floor((n-1)/2)-2*k+1)*cot(z)**(2*k), (k,0,C.floor((n-1)/2)))) * C.Sum((-1)**k*C.binomial(n,2*C.floor(n/2)-2*k)*cot(z)**(2*k), (k,0,C.floor(n/2))).doit()
 
     @classmethod
     def eval(cls, arg):
@@ -1051,6 +1052,7 @@ class sec(TrigonometricFunction):
 
     trules = {}
     trules["addition"] = lambda a,b: 1/(cos(b)*cos(a)-sin(a)*sin(b))
+    trules["multiarg"] = lambda n,z,k: 1 /(n * C.Sum((((-1)**k*C.factorial(-k+n-1)*2**(-2*k+n-1)) * cos(z)**(n-2*k))/(C.factorial(k)*C.factorial(n-2*k)), (k,0,C.floor(n/2))).doit())
 
     @classmethod
     def eval(cls, arg):
@@ -1203,6 +1205,7 @@ class csc(TrigonometricFunction):
 
     trules = {}
     trules["addition"] = lambda a,b: 1/(cos(b)*sin(a)+cos(a)*sin(b))
+    trules["multiarg"] = lambda n,z,k: csc(z) / (C.Sum((-1)**k*C.binomial(-k+n-1,k)*2**(-2*k+n-1)*cos(z)**(-2*k+n-1), (k,0,C.floor((n-1)/2))).doit())
 
     @classmethod
     def eval(cls, arg):
