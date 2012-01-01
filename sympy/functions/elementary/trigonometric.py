@@ -1,4 +1,5 @@
 from sympy.core.add import Add
+from sympy.core.mul import Mul
 from sympy.core.numbers import Rational, Float
 from sympy.core.basic import C, sympify, cacheit
 from sympy.core.singleton import S
@@ -16,6 +17,8 @@ class TrigonometricFunction(Function):
 
     nargs = 1
 
+    trules = {}
+
     def _eval_expand_complex(self, deep=True, **hints):
         re_part, im_part = self.as_real_imag(deep=deep, **hints)
         return re_part + im_part*S.ImaginaryUnit
@@ -32,6 +35,59 @@ class TrigonometricFunction(Function):
         else:
             re, im = self.args[0].as_real_imag()
         return (re, im)
+
+
+    def _eval_expand_trig_base(self, expr, deep=True, **hints):
+        if deep:
+            arg = expr.args[0].expand(deep, **hints)
+        else:
+            arg = expr.args[0]
+
+        result = None
+
+        if arg.is_Add:
+            x, y = arg.as_two_terms()
+            # We have two parts connected by addition
+            # trig(a + b) -> f(a,b)
+            # look up the transformation rule for this case:
+            rule = expr.trules["addition"]
+            result = rule(x,y)
+        elif arg.is_Mul:
+            factors = arg.as_ordered_factors()
+            rats = [ r for r in factors if r.is_Rational ]
+            rest = [ r for r in factors if not r in rats ]
+            ratpart = Mul(*rats)
+            restpart = Mul(*rest)
+            if not ratpart.is_Integer:
+                n, d = ratpart.as_numer_denom()
+                # Move denom to restpart
+                ratpart = n
+                restpart = restpart / d
+            # We have two parts connected by multiplication
+            # trig(n*x) -> f(n,x)
+            # look up the transformation rule for this case:
+            k = C.Dummy("k")
+            rule = expr.trules["multiarg"]
+            result = rule(ratpart, restpart, k)
+            # TODO:
+            # Handle rationals a/2
+            # Use half-angle formulae
+        else:
+            # TODO: More details
+            coeff, terms = arg.as_coeff_mul()
+            if coeff is not S.One and coeff.is_Integer and terms:
+                x = arg._new_rawargs(*terms)
+                y = (coeff-1)*x
+
+        # Still no result?
+        if result is None:
+            result = expr.func(arg)
+
+        return result
+
+
+    def _eval_expand_trig(self, deep=True, **hints):
+        return self._eval_expand_trig_base(self, deep=deep, **hints)
 
 
 def _peeloff_pi(arg):
@@ -164,6 +220,10 @@ class sin(TrigonometricFunction):
     .. [2] http://functions.wolfram.com/ElementaryFunctions/Sin
 
     """
+
+    trules = {}
+    trules["addition"] = lambda a,b: sin(a)*cos(b) + cos(a)*sin(b)
+    trules["multiarg"] = lambda n,z,k: C.Sum((-1)**k*C.binomial(n,2*k+1)*sin(z)**(2*k+1)*cos(z)**(-2*k+n-1), (k,0,C.floor((n-1)/2))).doit()
 
     @classmethod
     def eval(cls, arg):
@@ -310,23 +370,6 @@ class sin(TrigonometricFunction):
         re, im = self._as_real_imag(deep=deep, **hints)
         return (sin(re)*C.cosh(im), cos(re)*C.sinh(im))
 
-    def _eval_expand_trig(self, deep=True, **hints):
-        if deep:
-            arg = self.args[0].expand(deep, **hints)
-        else:
-            arg = self.args[0]
-        x = None
-        if arg.is_Add: # TODO, implement more if deep stuff here
-            x, y = arg.as_two_terms()
-        else:
-            coeff, terms = arg.as_coeff_mul()
-            if coeff is not S.One and coeff.is_Integer and terms:
-                x = arg._new_rawargs(*terms)
-                y = (coeff-1)*x
-        if x is not None:
-            return (sin(x)*cos(y) + sin(y)*cos(x)).expand(trig=True)
-        return sin(arg)
-
     def _eval_as_leading_term(self, x):
         arg = self.args[0].as_leading_term(x)
 
@@ -388,6 +431,10 @@ class cos(TrigonometricFunction):
     .. [2] http://functions.wolfram.com/ElementaryFunctions/Cos
 
     """
+
+    trules = {}
+    trules["addition"] = lambda a,b: cos(a)*cos(b) + sin(a)*sin(b)
+    trules["multiarg"] = lambda n,z,k: C.Sum((-1)**k*C.binomial(n,2*k)*sin(z)**(2*k)*cos(z)**(n-2*k), (k,0,C.floor((n)/2))).doit()
 
     @classmethod
     def eval(cls, arg):
@@ -531,22 +578,6 @@ class cos(TrigonometricFunction):
         re, im = self._as_real_imag(deep=deep, **hints)
         return (cos(re)*C.cosh(im), -sin(re)*C.sinh(im))
 
-    def _eval_expand_trig(self, deep=True, **hints):
-        if deep:
-            arg = self.args[0].expand()
-        else:
-            arg = self.args[0]
-        x = None
-        if arg.is_Add: # TODO, implement more if deep stuff here
-            x, y = arg.as_two_terms()
-            return (cos(x)*cos(y) - sin(y)*sin(x)).expand(trig=True)
-        else:
-            coeff, terms = arg.as_coeff_mul()
-            if coeff is not S.One and coeff.is_Integer and terms:
-                x = arg._new_rawargs(*terms)
-                return C.chebyshevt(coeff, cos(x))
-        return cos(arg)
-
     def _eval_as_leading_term(self, x):
         arg = self.args[0].as_leading_term(x)
 
@@ -603,6 +634,10 @@ class tan(TrigonometricFunction):
     .. [2] http://functions.wolfram.com/ElementaryFunctions/Tan
 
     """
+
+    trules = {}
+    trules["addition"] = lambda a,b: (tan(a) + tan(b))/(1-tan(a)*tan(b))
+    trules["multiarg"] = lambda n,z,k: 1/C.Sum((-1)**k*C.binomial(n,2*k)*tan(z)**(2*k), (k,0,C.floor(n/2)))* C.Sum((-1)**k*C.binomial(n,2*k+1)*tan(z)**(2*k+1), (k,0,C.floor((n-1)/2))).doit()
 
     @classmethod
     def eval(cls, arg):
@@ -721,9 +756,6 @@ class tan(TrigonometricFunction):
         denom = cos(2*re) + C.cosh(2*im)
         return (sin(2*re)/denom, C.sinh(2*im)/denom)
 
-    def _eval_expand_trig(self, deep=True, **hints):
-        return self
-
     def _eval_rewrite_as_exp(self, arg):
         exp, I = C.exp, S.ImaginaryUnit
         neg_exp, pos_exp = exp(-arg*I), exp(arg*I)
@@ -809,6 +841,9 @@ class cot(TrigonometricFunction):
     .. [2] http://functions.wolfram.com/ElementaryFunctions/Cot
 
     """
+
+    trules = {}
+    trules["addition"] = lambda a,b: (cot(a)*cot(b)-1)/(cot(a)*cot(b))
 
     @classmethod
     def eval(cls, arg):
@@ -1014,6 +1049,9 @@ class sec(TrigonometricFunction):
 
     """
 
+    trules = {}
+    trules["addition"] = lambda a,b: 1/(cos(b)*cos(a)-sin(a)*sin(b))
+
     @classmethod
     def eval(cls, arg):
         if arg.is_Number:
@@ -1115,13 +1153,6 @@ class sec(TrigonometricFunction):
         denom = cos(2*re) + C.cosh(2*im)
         return (2*cos(re)*C.cosh(im)/denom, 2*sin(re)*C.sinh(im)/denom)
 
-    def _eval_expand_trig(self, deep=True, **hints):
-        if deep:
-            arg = self.args[0].expand()
-        else:
-            arg = self.args[0]
-        return sec(arg)
-
     def _eval_is_real(self):
         return self.args[0].is_real
 
@@ -1169,6 +1200,9 @@ class csc(TrigonometricFunction):
     .. [2] http://functions.wolfram.com/ElementaryFunctions/Csc
 
     """
+
+    trules = {}
+    trules["addition"] = lambda a,b: 1/(cos(b)*sin(a)+cos(a)*sin(b))
 
     @classmethod
     def eval(cls, arg):
@@ -1268,13 +1302,6 @@ class csc(TrigonometricFunction):
         re, im = self._as_real_imag(deep=deep, **hints)
         denom = cos(2*re) - C.cosh(2*im)
         return (-2*sin(re)*C.cosh(im)/denom, 2*cos(re)*C.sinh(im)/denom)
-
-    def _eval_expand_trig(self, deep=True, **hints):
-        if deep:
-            arg = self.args[0].expand()
-        else:
-            arg = self.args[0]
-        return csc(arg)
 
     def _eval_is_real(self):
         return self.args[0].is_real
