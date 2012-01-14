@@ -195,6 +195,15 @@ class Ei(Function):
     @classmethod
     def eval(cls, z):
         from sympy import polar_lift, exp_polar
+        Evaluation at special points
+        if z.is_Number:
+            if z is S.Zero:
+                return -S.Infinity
+            elif z is S.Infinity:
+                return S.Infinity
+            #elif z is S.NegativeInfinity:
+            #    return S.Zero
+        # For negative arguments
         if z.is_negative:
             # Note: is this a good idea?
             return Ei(polar_lift(z)) - pi*I
