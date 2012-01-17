@@ -4,7 +4,10 @@ from sympy import (symbols, Rational, Symbol, Integral, log, diff, sin, exp,
     Limit, oo, Poly, Float, lowergamma, uppergamma, hyper, meijerg, polar_lift,
     Lambda, Poly, RootOf, RootSum, sqrt, Dict, catalan, Min, Max,
     cot, coth, re, im, root, arg, zeta, dirichlet_eta, binomial, RisingFactorial,
-    FallingFactorial, polylog, lerchphi, Ei, expint, Si, Ci, Shi, Chi)
+    FallingFactorial, polylog, lerchphi, Ei, expint, Si, Ci, Shi, Chi,
+    MellinTransform, InverseMellinTransform, LaplaceTransform, InverseLaplaceTransform,
+    FourierTransform, InverseFourierTransform, SineTransform, InverseSineTransform,
+    CosineTransform, InverseCosineTransform)
 from sympy.abc import mu, tau
 from sympy.printing.latex import latex
 from sympy.utilities.pytest import XFAIL, raises
@@ -447,3 +450,25 @@ def test_matAdd():
     l = LatexPrinter()
     assert l._print_MatAdd(C - 2*B) in ['- 2 B + C', '+ C - 2 B']
     assert l._print_MatAdd(C + 2*B) in ['+ 2 B + C', '+ C + 2 B']
+
+def test_integral_transforms():
+    x = Symbol("x")
+    k = Symbol("k")
+    f = Function("f")
+    a = Symbol("a")
+    b = Symbol("b")
+
+    assert latex(MellinTransform(f(x), x, k)) == r"\mathcal{M}_{x}\left[\operatorname{f}{\left (x \right )}\right]\left(k\right)"
+    assert latex(InverseMellinTransform(f(k), k, x, a,b)) == r"\mathcal{M}^{-1}_{k}\left[\operatorname{f}{\left (k \right )}\right]\left(x\right)"
+
+    assert latex(LaplaceTransform(f(x), x, k)) == r"\mathcal{L}_{x}\left[\operatorname{f}{\left (x \right )}\right]\left(k\right)"
+    assert latex(InverseLaplaceTransform(f(k), k, x, (a,b))) == r"\mathcal{L}^{-1}_{k}\left[\operatorname{f}{\left (k \right )}\right]\left(x\right)"
+
+    assert latex(FourierTransform(f(x), x, k)) == r"\mathcal{F}_{x}\left[\operatorname{f}{\left (x \right )}\right]\left(k\right)"
+    assert latex(InverseFourierTransform(f(k), k, x)) == r"\mathcal{F}^{-1}_{k}\left[\operatorname{f}{\left (k \right )}\right]\left(x\right)"
+
+    assert latex(CosineTransform(f(x), x, k)) == r"\mathcal{COS}_{x}\left[\operatorname{f}{\left (x \right )}\right]\left(k\right)"
+    assert latex(InverseCosineTransform(f(k), k, x)) == r"\mathcal{COS}^{-1}_{k}\left[\operatorname{f}{\left (k \right )}\right]\left(x\right)"
+
+    assert latex(SineTransform(f(x), x, k)) == r"\mathcal{SIN}_{x}\left[\operatorname{f}{\left (x \right )}\right]\left(k\right)"
+    assert latex(InverseSineTransform(f(k), k, x)) == r"\mathcal{SIN}^{-1}_{k}\left[\operatorname{f}{\left (k \right )}\right]\left(x\right)"
