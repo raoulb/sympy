@@ -398,7 +398,6 @@ def test_uniformsum():
                          *binomial(n, _k), (_k, 0, floor(_x)))/factorial(n - 1)))
 
 
-
 def test_weibull():
     a, b = symbols('a b', positive=True)
     X = Weibull(a, b)
