@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Continuous Random Variables - Prebuilt variables
 
@@ -144,7 +145,7 @@ def Arcsin(a=0, b=1, symbol=None):
     ========
 
     >>> from sympy.stats import Arcsin, Density
-    >>> from sympy import Symbol, simplify
+    >>> from sympy import Symbol, simplify, pprint
 
     >>> a = Symbol("a", real=True)
     >>> b = Symbol("b", real=True)
@@ -152,8 +153,12 @@ def Arcsin(a=0, b=1, symbol=None):
 
     >>> X = Arcsin(a, b, symbol=x)
 
-    >>> Density(X)
-    Lambda(_x, 1/(pi*sqrt((-_x + b)*(_x - a))))
+    >>> D = Density(X)
+    >>> pprint(D, use_unicode=True)
+     ⎛             1           ⎞
+    Λ⎜x, ──────────────────────⎟
+     ⎜       __________________⎟
+     ⎝   π⋅╲╱ (-x + b)⋅(x - a) ⎠
 
     References
     ==========
@@ -213,13 +218,13 @@ def Benini(alpha, beta, sigma, symbol=None):
     >>> X = Benini(alpha, beta, sigma, symbol=x)
 
     >>> D = Density(X)
-    >>> pprint(D, use_unicode=False)
-          /                                                             2       \
-          |   /                  /  x  \\             /  x  \            /  x  \|
-          |   |        2*beta*log|-----||  - alpha*log|-----| - beta*log |-----||
-          |   |alpha             \sigma/|             \sigma/            \sigma/|
-    Lambda|x, |----- + -----------------|*e                                     |
-          \   \  x             x        /                                       /
+    >>> pprint(D, use_unicode=True)
+     ⎛                                       2   ⎞
+     ⎜   ⎛           ⎛x⎞⎞         ⎛x⎞         ⎛x⎞⎟
+     ⎜   ⎜    2⋅β⋅log⎜─⎟⎟  - α⋅log⎜─⎟ - β⋅log ⎜─⎟⎟
+     ⎜   ⎜α          ⎝σ⎠⎟         ⎝σ⎠         ⎝σ⎠⎟
+    Λ⎜x, ⎜─ + ──────────⎟⋅ℯ                      ⎟
+     ⎝   ⎝x       x     ⎠                        ⎠
 
     References
     ==========
@@ -285,11 +290,11 @@ def Beta(alpha, beta, symbol=None):
     >>> X = Beta(alpha, beta, symbol=x)
 
     >>> D = Density(X)
-    >>> pprint(D, use_unicode=False)
-          /    alpha - 1         beta - 1                    \
-          |   x         *(-x + 1)        *gamma(alpha + beta)|
-    Lambda|x, -----------------------------------------------|
-          \               gamma(alpha)*gamma(beta)           /
+    >>> pprint(D, use_unicode=True)
+     ⎛    α - 1         β - 1         ⎞
+     ⎜   x     ⋅(-x + 1)     ⋅Γ(α + β)⎟
+    Λ⎜x, ─────────────────────────────⎟
+     ⎝             Γ(α)⋅Γ(β)          ⎠
 
     >>> simplify(E(X, meijerg=True))
     alpha/(alpha + beta)
@@ -352,11 +357,11 @@ def BetaPrime(alpha, beta, symbol=None):
     >>> X = BetaPrime(alpha, beta, symbol=x)
 
     >>> D = Density(X)
-    >>> pprint(D, use_unicode=False)
-          /    alpha - 1        -alpha - beta                    \
-          |   x         *(x + 1)             *gamma(alpha + beta)|
-    Lambda|x, ---------------------------------------------------|
-          \                 gamma(alpha)*gamma(beta)             /
+    >>> pprint(D, use_unicode=True)
+     ⎛    α - 1        -α - β         ⎞
+     ⎜   x     ⋅(x + 1)      ⋅Γ(α + β)⎟
+    Λ⎜x, ─────────────────────────────⎟
+     ⎝             Γ(α)⋅Γ(β)          ⎠
 
     References
     ==========
@@ -403,7 +408,7 @@ def Cauchy(x0, gamma, symbol=None):
     ========
 
     >>> from sympy.stats import Cauchy, Density
-    >>> from sympy import Symbol
+    >>> from sympy import Symbol, pprint
 
     >>> x0 = Symbol("x0")
     >>> gamma = Symbol("gamma", positive=True)
@@ -411,8 +416,15 @@ def Cauchy(x0, gamma, symbol=None):
 
     >>> X = Cauchy(x0, gamma, symbol=x)
 
-    >>> Density(X)
-    Lambda(_x, 1/(pi*gamma*(1 + (_x - x0)**2/gamma**2)))
+    >>> D = Density(X)
+    >>> pprint(D, use_unicode=True)
+     ⎛            1         ⎞
+    Λ⎜x, ───────────────────⎟
+     ⎜       ⎛            2⎞⎟
+     ⎜       ⎜    (x - x₀) ⎟⎟
+     ⎜   π⋅γ⋅⎜1 + ─────────⎟⎟
+     ⎜       ⎜         2   ⎟⎟
+     ⎝       ⎝        γ    ⎠⎠
 
     References
     ==========
@@ -459,15 +471,24 @@ def Chi(k, symbol=None):
     ========
 
     >>> from sympy.stats import Chi, Density, E, Std
-    >>> from sympy import Symbol, simplify
+    >>> from sympy import Symbol, simplify, pprint
 
     >>> k = Symbol("k", integer=True)
     >>> x = Symbol("x")
 
     >>> X = Chi(k, symbol=x)
 
-    >>> Density(X)
-    Lambda(_x, 2**(-k/2 + 1)*_x**(k - 1)*exp(-_x**2/2)/gamma(k/2))
+    >>> D = Density(X)
+    >>> pprint(D, use_unicode=True)
+     ⎛                      2⎞
+     ⎜      k             -x ⎟
+     ⎜    - ─ + 1         ───⎟
+     ⎜      2      k - 1   2 ⎟
+     ⎜   2       ⋅x     ⋅ℯ   ⎟
+    Λ⎜x, ────────────────────⎟
+     ⎜            ⎛k⎞        ⎟
+     ⎜           Γ⎜─⎟        ⎟
+     ⎝            ⎝2⎠        ⎠
 
     References
     ==========
@@ -517,7 +538,7 @@ def Dagum(p, a, b, symbol=None):
     ========
 
     >>> from sympy.stats import Dagum, Density
-    >>> from sympy import Symbol, simplify
+    >>> from sympy import Symbol, simplify, pprint
 
     >>> p = Symbol("p", positive=True)
     >>> b = Symbol("b", positive=True)
@@ -526,8 +547,15 @@ def Dagum(p, a, b, symbol=None):
 
     >>> X = Dagum(p, a, b, symbol=x)
 
-    >>> Density(X)
-    Lambda(_x, a*p*(_x/b)**(a*p)*((_x/b)**a + 1)**(-p - 1)/_x)
+    >>> D = Density(X)
+    >>> pprint(D, use_unicode=True)
+     ⎛                        -p - 1⎞
+     ⎜          a⋅p ⎛   a    ⎞      ⎟
+     ⎜       ⎛x⎞    ⎜⎛x⎞     ⎟      ⎟
+     ⎜   a⋅p⋅⎜─⎟   ⋅⎜⎜─⎟  + 1⎟      ⎟
+     ⎜       ⎝b⎠    ⎝⎝b⎠     ⎠      ⎟
+    Λ⎜x, ───────────────────────────⎟
+     ⎝                x             ⎠
 
     References
     ==========
