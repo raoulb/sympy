@@ -84,7 +84,7 @@ def add_formulae(formulae):
     from sympy import (exp, sqrt, root, cosh, log, asin, atan, I, lowergamma, cos,
                        atanh, besseli, gamma, erf, pi, sin, besselj, Ei,
                        EulerGamma, Shi, sinh, cosh, Chi, diag, Matrix,
-                       fresnels, fresnelc)
+                       fresnels, fresnelc, polylog)
     from sympy.functions.special.hyper import (HyperRep_atanh,
         HyperRep_power1, HyperRep_power2, HyperRep_log1, HyperRep_asin1,
         HyperRep_asin2, HyperRep_sqrts1, HyperRep_sqrts2, HyperRep_log2,
@@ -120,6 +120,9 @@ def add_formulae(formulae):
          Matrix([[1, 0]]),
          Matrix([[0, a],
                  [z*(2*a - 1)/2/(1 - z), S.Half - z*(2*a - 1)/(1 - z)]]))
+
+    # Polylog 0
+    add([1, a], [a+1], -a*polylog(0,a))
 
     # A. P. Prudnikov, Yu. A. Brychkov and O. I. Marichev (1990).
     # Integrals and Series: More Special Functions, Vol. 3,.
