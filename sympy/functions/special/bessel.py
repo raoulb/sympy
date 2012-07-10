@@ -1,6 +1,6 @@
 from __future__ import print_function, division
 
-from sympy import S, C, pi, I, Rational, Symbol, Wild, cacheit, sympify
+from sympy import S, C, pi, I, Rational, Symbol, Wild, cacheit, sympify, Add
 from sympy.core.function import Function, ArgumentIndexError
 from sympy.functions.elementary.trigonometric import sin, cos, csc, cot
 from sympy.functions.elementary.complexes import Abs
@@ -11,7 +11,6 @@ from sympy.functions.special.hyper import hyper
 from sympy.core.compatibility import xrange
 
 # TODO
-# o Airy Ai and Bi functions
 # o Scorer functions G1 and G2
 # o Asymptotic expansions
 #   These are possible, e.g. for fixed order, but since the bessel type
@@ -792,15 +791,16 @@ class airyai(AiryBase):
 
     @classmethod
     def eval(cls, arg):
-        if arg.is_Number:
-            if arg is S.NaN:
-                return S.NaN
-            elif arg is S.Infinity:
-                return S.Zero
-            elif arg is S.NegativeInfinity:
-                return S.Zero
-            elif arg is S.Zero:
-                return S.One / (3**Rational(2,3) * gamma(Rational(2,3)))
+        pass
+        # if arg.is_Number:
+        #     if arg is S.NaN:
+        #         return S.NaN
+        #     elif arg is S.Infinity:
+        #         return S.Zero
+        #     elif arg is S.NegativeInfinity:
+        #         return S.Zero
+        #     elif arg is S.Zero:
+        #         return S.One / (3**Rational(2,3) * gamma(Rational(2,3)))
 
     def fdiff(self, argindex=1):
         if argindex == 1:
@@ -871,15 +871,16 @@ class airybi(AiryBase):
 
     @classmethod
     def eval(cls, arg):
-        if arg.is_Number:
-            if arg is S.NaN:
-                return S.NaN
-            elif arg is S.Infinity:
-                return S.Infinity
-            elif arg is S.NegativeInfinity:
-                return S.Zero
-            elif arg is S.Zero:
-                return S.One / (3**Rational(1,6) * gamma(Rational(2,3)))
+        pass
+        # if arg.is_Number:
+        #     if arg is S.NaN:
+        #         return S.NaN
+        #     elif arg is S.Infinity:
+        #         return S.Infinity
+        #     elif arg is S.NegativeInfinity:
+        #         return S.Zero
+        #     elif arg is S.Zero:
+        #         return S.One / (3**Rational(1,6) * gamma(Rational(2,3)))
 
     def fdiff(self, argindex=1):
         if argindex == 1:
@@ -935,6 +936,9 @@ class airybi(AiryBase):
                     newarg = c*d**m*z**(m*n)
                     return S.Half*(sqrt(3)*(S.One - pf)*airyai(newarg) + (pf + S.One)*airybi(newarg))
 
+    def _eval_rewrite_as_tractable(self, z):
+        return C.exp(2*z**C.Rational(3,2)/3)*_airyais(z)/(sqrt(S.Pi)*root(z,4))
+
 
 class airyaiprime(AiryBase):
     r"""
@@ -947,13 +951,14 @@ class airyaiprime(AiryBase):
 
     @classmethod
     def eval(cls, arg):
-        if arg.is_Number:
-            if arg is S.NaN:
-                return S.NaN
-            elif arg is S.Infinity:
-                return S.Zero
-            elif arg is S.Zero:
-                return -S.One / (3**Rational(1,3) * gamma(Rational(1,3)))
+        pass
+        # if arg.is_Number:
+        #     if arg is S.NaN:
+        #         return S.NaN
+        #     elif arg is S.Infinity:
+        #         return S.Zero
+        #     elif arg is S.Zero:
+        #         return -S.One / (3**Rational(1,3) * gamma(Rational(1,3)))
 
     def fdiff(self, argindex=1):
         if argindex == 1:
@@ -1005,6 +1010,11 @@ class airyaiprime(AiryBase):
                     newarg = c*d**m*z**(3*m)
                     return S.Half*(pf + S.One)*airyaiprime(newarg) - S.One/(2*sqrt(3))*(S.One - pf)*airybiprime(newarg)
 
+    def _eval_rewrite_as_tractable(self, z):
+        # TODO: correct?
+        return (-(4*z**C.Rational(3,2) + 1)*C.exp(-2*z**C.Rational(3,2)/3)/(8*sqrt(pi)*z**C.Rational(5,4)) * _airyais(z)
+                + C.exp(-2*z**C.Rational(3,2)/3)/(sqrt(pi)*z**C.Rational(1,4)) * _airyaisprime(z))
+
 
 class airybiprime(AiryBase):
     r"""
@@ -1017,15 +1027,16 @@ class airybiprime(AiryBase):
 
     @classmethod
     def eval(cls, arg):
-        if arg.is_Number:
-            if arg is S.NaN:
-                return S.NaN
-            elif arg is S.Infinity:
-                return S.Infinity
-            elif arg is S.NegativeInfinity:
-                return S.Zero
-            elif arg is S.Zero:
-                return 3**Rational(1,6) / gamma(Rational(1,3))
+        pass
+        # if arg.is_Number:
+        #     if arg is S.NaN:
+        #         return S.NaN
+        #     elif arg is S.Infinity:
+        #         return S.Infinity
+        #     elif arg is S.NegativeInfinity:
+        #         return S.Zero
+        #     elif arg is S.Zero:
+        #         return 3**Rational(1,6) / gamma(Rational(1,3))
 
     def fdiff(self, argindex=1):
         if argindex == 1:
@@ -1077,6 +1088,11 @@ class airybiprime(AiryBase):
                     newarg = c*d**m*z**(3*m)
                     return S.Half*((S.One + pf)*airybiprime(newarg) - sqrt(3)*(S.One - pf)*airyaiprime(newarg))
 
+    def _eval_rewrite_as_tractable(self, z):
+        # TODO: correct?
+        return ((z**C.Rational(3,2) - C.Rational(1,4))*C.exp(2*z**C.Rational(3,2)/3)/(sqrt(pi)*z**C.Rational(5,4)) * _airyais(z)
+                + C.exp(2*z**C.Rational(3,2)/3)/(sqrt(pi)*z**C.Rational(1,4)) * _airyaisprime(z))
+
 
 ###############################################################################
 #################### HELPER FUNCTIONS #########################################
@@ -1092,7 +1108,7 @@ class _airyais(Function):
 
     def _eval_aseries(self, n, args0, x, logx):
         if args0[0] != S.Infinity:
-            return super(_erfs, self)._eval_aseries(n, args0, x, logx)
+            return super(_airyais, self)._eval_aseries(n, args0, x, logx)
 
         z = self.args[0]
         r16 = C.Rational(1,6)
@@ -1104,11 +1120,13 @@ class _airyais(Function):
         # It is very inefficient to first add the order and then do the nseries
         return (Add(*l))._eval_nseries(x, n, logx) + o
 
-    # def fdiff(self, argindex=1):
-    #     if argindex == 1:
-    #         pass
-    #     else:
-    #         raise ArgumentIndexError(self, argindex)
+    def fdiff(self, argindex=1):
+        if argindex == 1:
+            # TODO: correct?
+            z = self.args[0]
+            return _airyaisprime(z)
+        else:
+            raise ArgumentIndexError(self, argindex)
 
     def _eval_rewrite_as_intractable(self, z):
         return 2*sqrt(S.Pi)*root(z,4)*airyai(z)/C.exp(-2*z**C.Rational(3,2)/3)
@@ -1124,7 +1142,7 @@ class _airyaisprime(Function):
 
     def _eval_aseries(self, n, args0, x, logx):
         if args0[0] != S.Infinity:
-            return super(_erfs, self)._eval_aseries(n, args0, x, logx)
+            return super(_airyaisprime, self)._eval_aseries(n, args0, x, logx)
 
         z = self.args[0]
         r16 = C.Rational(1,6)
@@ -1136,11 +1154,15 @@ class _airyaisprime(Function):
         # It is very inefficient to first add the order and then do the nseries
         return (Add(*l))._eval_nseries(x, n, logx) + o
 
-    # def fdiff(self, argindex=1):
-    #     if argindex == 1:
-    #         pass
-    #     else:
-    #         raise ArgumentIndexError(self, argindex)
+    def fdiff(self, argindex=1):
+        if argindex == 1:
+            # TODO: correct?
+            z = self.args[0]
+            return z*_airyais(z)
+        else:
+            raise ArgumentIndexError(self, argindex)
 
-    # def _eval_rewrite_as_intractable(self, z):
-    #     pass
+    def _eval_rewrite_as_intractable(self, z):
+        # TODO: correct?
+        return (sqrt(pi)*z**C.Rational(1,4)*C.exp(2*z**C.Rational(3,2)/3) * airyaiprime(z)
+                + (4*z**C.Rational(3,2) + 1)/(4*z) * airyai(z))
