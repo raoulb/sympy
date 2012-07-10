@@ -856,6 +856,9 @@ class airyai(AiryBase):
                     newarg = c*d**m*z**(m*n)
                     return S.Half*(pf + S.One)*airyai(newarg) - S.One/(2*sqrt(3))*(pf - S.One)*airybi(newarg)
 
+    def _eval_rewrite_as_tractable(self, z):
+        return S.Half*C.exp(-2*z**C.Rational(3,2)/3)*_airyais(z)/(sqrt(S.Pi)*root(z,4))
+
 
 class airybi(AiryBase):
     r"""
@@ -1073,3 +1076,71 @@ class airybiprime(AiryBase):
                     pf = (d*z**3)**(2*m) / (d**(2*m)*z**(6*m))
                     newarg = c*d**m*z**(3*m)
                     return S.Half*((S.One + pf)*airybiprime(newarg) - sqrt(3)*(S.One - pf)*airyaiprime(newarg))
+
+
+###############################################################################
+#################### HELPER FUNCTIONS #########################################
+###############################################################################
+
+class _airyais(Function):
+    """
+    Helper function to make the :math:`Ai(z)` and :math:`Bi(z)` functions
+    tractable for the Gruntz algorithm.
+    """
+
+    nargs = 1
+
+    def _eval_aseries(self, n, args0, x, logx):
+        if args0[0] != S.Infinity:
+            return super(_erfs, self)._eval_aseries(n, args0, x, logx)
+
+        z = self.args[0]
+        r16 = C.Rational(1,6)
+        r56 = C.Rational(5,6)
+        fac = gamma(r16)*gamma(r56)
+        l = [ gamma(k+r16)*gamma(k+r56)/(fac*C.factorial(k)) * (-Rational(3,4))**k
+              / z**Rational(3*k,2) for k in xrange(0,n) ]
+        o = C.Order(1/z**((3*n+3)/2), x)
+        # It is very inefficient to first add the order and then do the nseries
+        return (Add(*l))._eval_nseries(x, n, logx) + o
+
+    # def fdiff(self, argindex=1):
+    #     if argindex == 1:
+    #         pass
+    #     else:
+    #         raise ArgumentIndexError(self, argindex)
+
+    def _eval_rewrite_as_intractable(self, z):
+        return 2*sqrt(S.Pi)*root(z,4)*airyai(z)/C.exp(-2*z**C.Rational(3,2)/3)
+
+
+class _airyaisprime(Function):
+    """
+    Helper function to make the :math:`Ai(z)` and :math:`Bi(z)` functions
+    tractable for the Gruntz algorithm.
+    """
+
+    nargs = 1
+
+    def _eval_aseries(self, n, args0, x, logx):
+        if args0[0] != S.Infinity:
+            return super(_erfs, self)._eval_aseries(n, args0, x, logx)
+
+        z = self.args[0]
+        r16 = C.Rational(1,6)
+        r56 = C.Rational(5,6)
+        fac = gamma(r16)*gamma(r56)
+        l = [ gamma(k+r16)*gamma(k+r56)/(fac*C.factorial(k)) * (-Rational(3,4))**k
+              * (-3*k*S.Half) / z**(Rational(3*k,2)+1) for k in xrange(0,n) ]
+        o = C.Order(1/z**((3*n+5)/2), x)
+        # It is very inefficient to first add the order and then do the nseries
+        return (Add(*l))._eval_nseries(x, n, logx) + o
+
+    # def fdiff(self, argindex=1):
+    #     if argindex == 1:
+    #         pass
+    #     else:
+    #         raise ArgumentIndexError(self, argindex)
+
+    # def _eval_rewrite_as_intractable(self, z):
+    #     pass
