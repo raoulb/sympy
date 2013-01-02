@@ -144,7 +144,7 @@ class erf(Function):
         else:
             return self.func(arg)
 
-    def as_real_imag(self, deep=True, **hints):
+    def _as_real_imag(self, deep=True, **hints):
         if self.args[0].is_real:
             if deep:
                 hints['complex'] = False
@@ -289,7 +289,7 @@ class erfc(Function):
         else:
             return self.func(arg)
 
-    def as_real_imag(self, deep=True, **hints):
+    def _as_real_imag(self, deep=True, **hints):
         if self.args[0].is_real:
             if deep:
                 hints['complex'] = False
@@ -421,7 +421,7 @@ class erfi(Function):
     def _eval_rewrite_as_erfc(self, z):
         return I*erfc(I*z) - I
 
-    def as_real_imag(self, deep=True, **hints):
+    def _as_real_imag(self, deep=True, **hints):
         if self.args[0].is_real:
             if deep:
                 hints['complex'] = False
