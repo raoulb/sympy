@@ -79,6 +79,17 @@ Bessel Type Functions
 
 .. autofunction:: sympy.functions.special.bessel.jn_zeros
 
+Airy Functions
+--------------
+
+.. autoclass:: sympy.functions.special.bessel.AiryBase
+   :members:
+
+.. autoclass:: sympy.functions.special.bessel.airyai
+.. autoclass:: sympy.functions.special.bessel.airybi
+.. autoclass:: sympy.functions.special.bessel.airyaiprime
+.. autoclass:: sympy.functions.special.bessel.airybiprime
+
 B-Splines
 ---------
 
