@@ -47,6 +47,10 @@ def test_expand():
     assert expand_func(besselj(S(1)/2, z)) == sqrt(2)*sin(z)/(sqrt(pi)*sqrt(z))
     assert expand_func(
         bessely(S(1)/2, z)) == -sqrt(2)*cos(z)/(sqrt(pi)*sqrt(z))
+    assert expand_func(besseli(2, x)) == \
+        besseli(0, x) - 2*besseli(1, x)/x
+    assert expand_func(besselj(2, x)) == \
+        -besselj(0, x) + 2*besselj(1, x)/x
 
 
 def test_fn():
