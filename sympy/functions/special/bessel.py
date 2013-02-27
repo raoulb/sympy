@@ -259,6 +259,10 @@ class besseli(BesselBase):
     @classmethod
     def eval(cls, nu, z):
         if nu.is_Integer:
+            if nu < 0:
+                return besseli(-nu, z)
+            if z.could_extract_minus_sign():
+                return S(-1)**nu*besseli(nu, -z)
             newz = z.extract_multiplicatively(I)
             if newz:  # NOTE we don't want to change the function if z==0
                 return I**(-nu)*besselj(nu, -newz)
@@ -322,6 +326,12 @@ class besselk(BesselBase):
 
     _a = S.One
     _b = -S.One
+
+    @classmethod
+    def eval(cls, nu, z):
+        if nu.is_Integer:
+            if nu < 0:
+                return besselk(-nu, z)
 
 
 class hankel1(BesselBase):

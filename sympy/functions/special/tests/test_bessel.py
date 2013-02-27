@@ -115,11 +115,20 @@ def test_jn_zeros():
 
 def test_bessel_eval():
     from sympy import I
+    assert besseli(-4, z) == besseli(4, z)
+    assert besseli(-3, z) == besseli(3, z)
+
     assert besselj(-4, z) == besselj(4, z)
     assert besselj(-3, z) == -besselj(3, z)
 
     assert bessely(-2, z) == bessely(2, z)
     assert bessely(-1, z) == -bessely(1, z)
+
+    assert besselk(-2, z) == besselk(2, z)
+    assert besselk(-1, z) == besselk(1, z)
+
+    assert besseli(2, -z) == besseli(2, z)
+    assert besseli(3, -z) == -besseli(3, z)
 
     assert besselj(0, -z) == besselj(0, z)
     assert besselj(1, -z) == -besselj(1, z)
