@@ -158,8 +158,8 @@ class besselj(BesselBase):
             return self._eval_rewrite_as_jn(*self.args, **{'expand': True})
         elif nu.is_Integer and nu > 1:
             z = self.argument
-            return -besselj(nu - 2, z)._eval_expand_func() + \
-                    2*(nu - 1)*besselj(nu - 1, z)._eval_expand_func()/z
+            return (-besselj(nu - 2, z)._eval_expand_func() +
+                    2*(nu - 1)*besselj(nu - 1, z)._eval_expand_func()/z)
         return self
 
     def _eval_rewrite_as_besseli(self, nu, z):
@@ -289,8 +289,8 @@ class besseli(BesselBase):
         nu = self.order
         if nu.is_Integer and nu > 1:
             z = self.argument
-            return besseli(nu - 2, z)._eval_expand_func() - \
-                    2*(nu - 1)*besseli(nu - 1, z)._eval_expand_func()/z
+            return (besseli(nu - 2, z)._eval_expand_func() -
+                    2*(nu - 1)*besseli(nu - 1, z)._eval_expand_func()/z)
         return self
 
 
