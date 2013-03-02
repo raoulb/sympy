@@ -1,7 +1,7 @@
 """Bessel type functions"""
 
 from sympy import S, pi, I
-from sympy.core.function import Function, ArgumentIndexError
+from sympy.core.function import Function, ArgumentIndexError, expand_func
 from sympy.functions.elementary.trigonometric import sin, cos
 from sympy.functions.elementary.miscellaneous import sqrt
 from sympy.functions.elementary.complexes import re
@@ -308,6 +308,8 @@ class besseli(BesselBase):
 
     def _eval_expand_func(self, **hints):
         nu = self.order
+        if nu.is_Rational and nu.q == 2:
+            return expand_func(self._eval_rewrite_as_besselj(*self.args))
         if nu.is_Integer and nu > 1:
             z = self.argument
             return (besseli(nu - 2, z)._eval_expand_func() -
