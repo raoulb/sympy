@@ -4,6 +4,7 @@ from sympy import S, pi, I
 from sympy.core.function import Function, ArgumentIndexError
 from sympy.functions.elementary.trigonometric import sin, cos
 from sympy.functions.elementary.miscellaneous import sqrt
+from sympy.functions.elementary.complexes import re
 
 # TODO
 # o Airy Ai and Bi functions
@@ -129,6 +130,10 @@ class besselj(BesselBase):
 
     @classmethod
     def eval(cls, nu, z):
+        if z.is_zero:
+            if nu.is_integer or (re(nu) > 0) is True:
+                return S.Zero
+
         if nu.is_integer:
             if nu.is_negative:
                 return S(-1)**nu*besselj(-nu, z)
@@ -268,6 +273,12 @@ class besseli(BesselBase):
 
     @classmethod
     def eval(cls, nu, z):
+        if z.is_zero:
+            if nu.is_zero:
+                return S.One
+            if nu.is_integer or (re(nu) > 0) is True:
+                return S.Zero
+
         if nu.is_integer:
             if nu.is_negative:
                 return besseli(-nu, z)
