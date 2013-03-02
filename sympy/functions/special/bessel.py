@@ -129,8 +129,8 @@ class besselj(BesselBase):
 
     @classmethod
     def eval(cls, nu, z):
-        if nu.is_Integer:
-            if nu < 0:
+        if nu.is_integer:
+            if nu.is_negative:
                 return S(-1)**nu*besselj(-nu, z)
             if z.could_extract_minus_sign():
                 return S(-1)**nu*besselj(nu, -z)
@@ -211,8 +211,8 @@ class bessely(BesselBase):
 
     @classmethod
     def eval(cls, nu, z):
-        if nu.is_Integer:
-            if nu < 0:
+        if nu.is_integer:
+            if nu.is_negative:
                 return S(-1)**nu*bessely(-nu, z)
 
     def _eval_expand_func(self, **hints):
@@ -258,8 +258,8 @@ class besseli(BesselBase):
 
     @classmethod
     def eval(cls, nu, z):
-        if nu.is_Integer:
-            if nu < 0:
+        if nu.is_integer:
+            if nu.is_negative:
                 return besseli(-nu, z)
             if z.could_extract_minus_sign():
                 return S(-1)**nu*besseli(nu, -z)
@@ -329,8 +329,8 @@ class besselk(BesselBase):
 
     @classmethod
     def eval(cls, nu, z):
-        if nu.is_Integer:
-            if nu < 0:
+        if nu.is_integer:
+            if nu.is_negative:
                 return besselk(-nu, z)
 
 
