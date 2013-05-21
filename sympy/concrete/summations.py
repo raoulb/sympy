@@ -1,4 +1,3 @@
-from sympy.core.add import Add
 from sympy.core.basic import C
 from sympy.core.containers import Tuple
 from sympy.core.expr import Expr
@@ -111,9 +110,9 @@ class Sum(Expr):
         Return True if the Sum will result in a number, else False.
 
         Sums are a special case since they contain symbols that can
-        be replaced with numbers. Whether the integral can be done or not is
-        another issue. But answering whether the final result is a number is
-        not difficult.
+        be replaced with numbers. Whether the sum can be done or not in
+        closed form is another issue. But answering whether the final
+        result is a number is not difficult.
 
         Examples
         ========
@@ -299,9 +298,81 @@ class Sum(Expr):
         return s + iterm, abs(term)
 
     def _eval_subs(self, old, new):
-        from sympy.integrals.integrals import _eval_subs
-        return _eval_subs(self, old, new)
+        from sympy.polys.polytools import Poly
+        # from sympy.integrals.integrals import _eval_subs
+        # return _eval_subs(self, old, new)
+        summand, limits = self.function, list(self.limits)
+        limits.reverse() # so that scoping matches standard mathematical practice for scoping
 
+        # If one of the expressions we are replacing is used as a coordinate
+        # one of two things happens.
+        #   - the old variable first appears as a free variable
+        #       so we perform all free substitutions before it becomes
+        #       a coordinate.
+        #   - the old variable first appears as a coordinate, in
+        #       which case we change that coordinate.
+        if not isinstance(old,C.Symbol) or 0!= len(old.free_symbols.intersection(self.free_symbols)):
+            sub_into_summand = True
+            for i, xab in enumerate(limits):
+                assert len(xab) == 3, "undefined summation limit in substitution"
+                (x,a,b) = xab
+                limits[i] = (x, a._subs(old, new),b._subs(old,new))
+                if 0!= len(x.free_symbols.intersection(old.free_symbols)):
+                    sub_into_summand = False
+                    break
+            if sub_into_summand:
+                summand = summand.subs(old, new)
+        else:
+            new_ns = new.free_symbols.difference(self.free_symbols)
+            assert 1==len(new_ns), "no free symbols as dummies"
+            new_n = new_ns.pop(); del new_ns
+            assert new.is_polynomial(new_n) \
+                and Poly(new,new_n).degree() == 1, \
+                "Only linear substitutions allowed for Sum"
+            assert new.coeff(new_n,1) in [1,-1], \
+                "Sum substitution slope must be in [-1,1]."
+            found = False
+            for i, xab in enumerate(limits):
+                if len(xab) != 3:
+                    continue
+                (x,a,b) = xab
+                if not found:
+                    if old == x:
+                        found = True
+                        assert old != new_n
+                        sols = solve(new-old,new_n)
+                        assert 1 == len(sols)
+                        sol = sols[0]
+                        limits[i] = (new_n, sol.subs(old,a) ,sol.subs(old,b))
+                    else:
+                        assert old.free_symbols.isdisjoint(a.free_symbols)
+                        assert old.free_symbols.isdisjoint(b.free_symbols)
+                else:
+                    assert x != old, "repeated dummy variable in Sum"
+                    limits[i] = (x,a.subs(old,new),b.subs(old,new))
+            summand = summand.subs(old, new)
+        return self.func(summand, *limits)
+
+    def _eval_factor(self):
+        summand = self.function
+        summand = summand.factor()
+        IN = []
+        OUT = []
+        if not ( summand.is_Mul and summand.is_commutative ):
+            return self
+        for i in summand.args:
+            if i.atoms().isdisjoint(self.variables):
+                OUT.append(i)
+            else:
+                IN.append(i)
+        return C.Mul(*OUT)*Sum(C.Mul(*IN),*self.limits)
+
+    def _eval_expand(self, **hints):
+        summand = self.function
+        summand = summand.expand()
+        if summand.is_Add and summand.is_commutative:
+            return C.Add(*[ Sum(i.expand(),*self.limits) for i in summand.args ])
+        return
 
 def summation(f, *symbols, **kwargs):
     r"""
@@ -444,7 +515,7 @@ def eval_sum_direct(expr, limits):
     (i, a, b) = limits
 
     dif = b - a
-    return Add(*[expr.subs(i, a + j) for j in xrange(dif + 1)])
+    return C.Add(*[expr.subs(i, a + j) for j in xrange(dif + 1)])
 
 
 def eval_sum_symbolic(f, limits):

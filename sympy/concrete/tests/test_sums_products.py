@@ -544,3 +544,26 @@ def test_issue_3175():
     assert NS(Sum(x, (x, 1, 0))) == '0.e-122'
     assert Sum(n, (n, 10, 5)).doit() == -30
     assert NS(Sum(n, (n, 10, 5))) == '-30.0000000000000'
+
+
+def test_factor_expand_subs():
+    # test factoring
+    assert Sum(4*x,(x,1,y)).factor() == 4*Sum(x,(x,1,y))
+    assert Sum(x*a,(x,1,y)).factor() == a*Sum(x,(x,1,y))
+    assert Sum(4*x*a,(x,1,y)).factor() == 4*a*Sum(x,(x,1,y))
+    assert Sum(4*x*y,(x,1,y)).factor() == 4*y*Sum(x,(x,1,y))
+
+    # test expand
+    assert Sum(x+1,(x,1,y))._eval_expand() == Sum(x,(x,1,y)) + Sum(1,(x,1,y))
+    assert Sum(x+a*x**2,(x,1,y))._eval_expand() == Sum(x,(x,1,y)) + Sum(a*x**2,(x,1,y))
+    assert Sum(x**(n + 1)*(n + 1), (n, -1, oo))._eval_expand() \
+        == Sum(x*x**n, (n, -1, oo)) \
+        + Sum(n*x*x**n, (n, -1, oo))
+    assert Sum(a*n+a*n**2,(n,0,4))._eval_expand() \
+        == Sum(a*n,(n,0,4)) + Sum(a*n**2,(n,0,4))
+
+    # test subs
+    assert Sum(d(x+1),(x,0,3)).subs([(x,n-1)]) == Sum(d(n),(n,1,4))
+    assert Sum(-n + 4, (n, 3, -6)) == Sum(x, (x, 1, 10)).subs([(x,4-n)])
+    raises(AssertionError, lambda: Sum(1/x,(x,1,10)).subs([(x,(3+n)**3)]) )
+    raises(AssertionError, lambda: Sum(1/x,(x,1,10)).subs([(x,3*x-2)]) )
