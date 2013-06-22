@@ -311,7 +311,7 @@ class Sum(Expr):
         #       a coordinate.
         #   - the old variable first appears as a coordinate, in
         #       which case we change that coordinate.
-        if not isinstance(old,C.Symbol) or 0!= len(old.free_symbols.intersection(self.free_symbols)):
+        if not isinstance(old,C.Symbol) or old.free_symbols.intersection(self.free_symbols):
             sub_into_summand = True
             for i, xab in enumerate(limits):
                 assert len(xab) == 3, "undefined summation limit in substitution"
@@ -345,34 +345,33 @@ class Sum(Expr):
                         sol = sols[0]
                         limits[i] = (new_n, sol.subs(old,a) ,sol.subs(old,b))
                     else:
-                        assert old.free_symbols.isdisjoint(a.free_symbols)
-                        assert old.free_symbols.isdisjoint(b.free_symbols)
+                        assert not old.free_symbols.intersection(a.free_symbols)
+                        assert not old.free_symbols.intersection(b.free_symbols)
                 else:
                     assert x != old, "repeated dummy variable in Sum"
                     limits[i] = (x,a.subs(old,new),b.subs(old,new))
             summand = summand.subs(old, new)
         return self.func(summand, *limits)
 
-    def _eval_factor(self):
-        summand = self.function
-        summand = summand.factor()
-        IN = []
-        OUT = []
-        if not ( summand.is_Mul and summand.is_commutative ):
-            return self
-        for i in summand.args:
-            if i.atoms().isdisjoint(self.variables):
-                OUT.append(i)
-            else:
-                IN.append(i)
-        return C.Mul(*OUT)*Sum(C.Mul(*IN),*self.limits)
+    def _eval_factor(self, **hints):
+        summand = self.function.factor(**hints)
+        IN, OUT = [], []
+        if summand.is_Mul and summand.is_commutative:
+            for i in summand.args:
+                if not i.atoms(C.Symbol).intersection(self.variables):
+                    OUT.append(i)
+                else:
+                    IN.append(i)
+            return C.Mul(*OUT)*Sum(C.Mul(*IN),*self.limits)
+        return self
 
-    def _eval_expand(self, **hints):
-        summand = self.function
-        summand = summand.expand()
+    def _eval_expand_basic(self, **hints):
+        summand = self.function.expand(**hints)
         if summand.is_Add and summand.is_commutative:
-            return C.Add(*[ Sum(i.expand(),*self.limits) for i in summand.args ])
-        return
+            return C.Add(*[ Sum(i,*self.limits) for i in summand.args ])
+        elif summand != self.function:
+            return Sum(summand,*self.limits)
+        return self
 
 def summation(f, *symbols, **kwargs):
     r"""
