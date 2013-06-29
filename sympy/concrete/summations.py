@@ -355,23 +355,25 @@ class Sum(Expr):
 
     def _eval_factor(self, **hints):
         summand = self.function.factor(**hints)
-        IN, OUT = [], []
+        keep_inside = []
+        pull_outside = []
         if summand.is_Mul and summand.is_commutative:
             for i in summand.args:
                 if not i.atoms(C.Symbol).intersection(self.variables):
-                    OUT.append(i)
+                    pull_outside.append(i)
                 else:
-                    IN.append(i)
-            return C.Mul(*OUT)*Sum(C.Mul(*IN),*self.limits)
+                    keep_inside.append(i)
+            return C.Mul(*pull_outside) * Sum(C.Mul(*keep_inside), *self.limits)
         return self
 
     def _eval_expand_basic(self, **hints):
         summand = self.function.expand(**hints)
         if summand.is_Add and summand.is_commutative:
-            return C.Add(*[ Sum(i,*self.limits) for i in summand.args ])
+            return C.Add(*[ Sum(i, *self.limits) for i in summand.args ])
         elif summand != self.function:
-            return Sum(summand,*self.limits)
+            return Sum(summand, *self.limits)
         return self
+
 
 def summation(f, *symbols, **kwargs):
     r"""
