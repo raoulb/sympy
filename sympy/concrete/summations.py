@@ -299,57 +299,58 @@ class Sum(Expr):
 
     def _eval_subs(self, old, new):
         from sympy.polys.polytools import Poly
-        # from sympy.integrals.integrals import _eval_subs
-        # return _eval_subs(self, old, new)
         summand, limits = self.function, list(self.limits)
-        limits.reverse() # so that scoping matches standard mathematical practice for scoping
+        # Reorder limits so that scoping matches standard mathematical practice for scoping
+        limits.reverse()
 
-        # If one of the expressions we are replacing is used as a coordinate
+        # If one of the expressions we are replacing is used as a summation index
         # one of two things happens.
         #   - the old variable first appears as a free variable
-        #       so we perform all free substitutions before it becomes
-        #       a coordinate.
-        #   - the old variable first appears as a coordinate, in
-        #       which case we change that coordinate.
-        if not isinstance(old,C.Symbol) or old.free_symbols.intersection(self.free_symbols):
+        #     so we perform all free substitutions before it becomes
+        #     a summation index.
+        #   - the old variable first appears as a summation index, in
+        #     which case we change that summation index.
+        if not isinstance(old, C.Symbol) or old.free_symbols.intersection(self.free_symbols):
             sub_into_summand = True
             for i, xab in enumerate(limits):
-                assert len(xab) == 3, "undefined summation limit in substitution"
-                (x,a,b) = xab
-                limits[i] = (x, a._subs(old, new),b._subs(old,new))
-                if 0!= len(x.free_symbols.intersection(old.free_symbols)):
+                if len(xab) != 3
+                    raise ValueError("undefined summation limit in substitution")
+                x, a, b = xab
+                limits[i] = (x, a._subs(old, new), b._subs(old,new))
+                if len(x.free_symbols.intersection(old.free_symbols)) != 0:
                     sub_into_summand = False
                     break
             if sub_into_summand:
                 summand = summand.subs(old, new)
         else:
             new_ns = new.free_symbols.difference(self.free_symbols)
-            assert 1==len(new_ns), "no free symbols as dummies"
-            new_n = new_ns.pop(); del new_ns
-            assert new.is_polynomial(new_n) \
-                and Poly(new,new_n).degree() == 1, \
-                "Only linear substitutions allowed for Sum"
-            assert new.coeff(new_n,1) in [1,-1], \
-                "Sum substitution slope must be in [-1,1]."
+            if len(new_ns) != 1:
+                raise ValueError("No free symbols as dummies")
+            new_n = new_ns.pop()
+            del new_ns
+            if not (new.is_polynomial(new_n) and Poly(new,new_n).degree() == 1):
+                raise ValueError("Only linear substitutions allowed for Sum")
+            if not new.coeff(new_n,1) in (1,-1):
+                raise ValueError("Sum substitution slope must be in [-1,1].")
             found = False
             for i, xab in enumerate(limits):
                 if len(xab) != 3:
                     continue
-                (x,a,b) = xab
+                x, a, b = xab
                 if not found:
                     if old == x:
                         found = True
                         assert old != new_n
-                        sols = solve(new-old,new_n)
-                        assert 1 == len(sols)
+                        sols = solve(new - old, new_n)
+                        assert len(sols) == 1
                         sol = sols[0]
-                        limits[i] = (new_n, sol.subs(old,a) ,sol.subs(old,b))
+                        limits[i] = (new_n, sol.subs(old, a), sol.subs(old, b))
                     else:
                         assert not old.free_symbols.intersection(a.free_symbols)
                         assert not old.free_symbols.intersection(b.free_symbols)
                 else:
                     assert x != old, "repeated dummy variable in Sum"
-                    limits[i] = (x,a.subs(old,new),b.subs(old,new))
+                    limits[i] = (x, a.subs(old,new), b.subs(old,new))
             summand = summand.subs(old, new)
         return self.func(summand, *limits)
 
