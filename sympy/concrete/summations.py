@@ -313,7 +313,7 @@ class Sum(Expr):
         if not isinstance(old, C.Symbol) or old.free_symbols.intersection(self.free_symbols):
             sub_into_summand = True
             for i, xab in enumerate(limits):
-                if len(xab) != 3
+                if len(xab) != 3:
                     raise ValueError("undefined summation limit in substitution")
                 x, a, b = xab
                 limits[i] = (x, a._subs(old, new), b._subs(old,new))
@@ -327,10 +327,9 @@ class Sum(Expr):
             if len(new_ns) != 1:
                 raise ValueError("No free symbols as dummies")
             new_n = new_ns.pop()
-            del new_ns
             if not (new.is_polynomial(new_n) and Poly(new,new_n).degree() == 1):
                 raise ValueError("Only linear substitutions allowed for Sum")
-            if not new.coeff(new_n,1) in (1,-1):
+            if not new.coeff(new_n, 1) in (1,-1):
                 raise ValueError("Sum substitution slope must be in [-1,1].")
             found = False
             for i, xab in enumerate(limits):
@@ -349,7 +348,8 @@ class Sum(Expr):
                         assert not old.free_symbols.intersection(a.free_symbols)
                         assert not old.free_symbols.intersection(b.free_symbols)
                 else:
-                    assert x != old, "repeated dummy variable in Sum"
+                    if x == old:
+                        raise ValueError("repeated dummy variable in Sum")
                     limits[i] = (x, a.subs(old,new), b.subs(old,new))
             summand = summand.subs(old, new)
         return self.func(summand, *limits)
