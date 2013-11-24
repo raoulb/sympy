@@ -84,11 +84,6 @@ class ExprWithLimits(Expr):
             limits = list(function.limits) + limits
             function = function.function
 
-        # Only limits with lower and upper bounds are supported; the indefinite form
-        # is not supported
-        if any(len(l) != 3 or None in l for l in limits):
-            raise ValueError('ExprWithLimits requires values for lower and upper bounds.')
-
         obj = Expr.__new__(cls, **assumptions)
         arglist = [function]
         arglist.extend(limits)
