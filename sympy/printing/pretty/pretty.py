@@ -400,6 +400,16 @@ class PrettyPrinter(Printer):
         sign_height = 0
 
         for lim in expr.limits:
+            if len(lim) == 3:
+                pretty_upper = self._print(lim[2])
+                pretty_lower = self._print(C.Equality(lim[0], lim[1]))
+            elif len(lim) == 2:
+                pretty_upper = self._print("")
+                pretty_lower = self._print(C.Equality(lim[0], lim[1]))
+            elif len(lim) == 1:
+                pretty_upper = self._print("")
+                pretty_lower = self._print(lim[0])
+
             width = (func_height + 2) * 5 // 3 - 2
             sign_lines = []
             sign_lines.append(corner_chr + (horizontal_chr*width) + corner_chr)
@@ -408,9 +418,6 @@ class PrettyPrinter(Printer):
 
             pretty_sign = stringPict('')
             pretty_sign = prettyForm(*pretty_sign.stack(*sign_lines))
-
-            pretty_upper = self._print(lim[2])
-            pretty_lower = self._print(C.Equality(lim[0], lim[1]))
 
             max_upper = max(max_upper, pretty_upper.height())
 
