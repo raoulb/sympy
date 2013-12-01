@@ -610,6 +610,15 @@ class StrPrinter(Printer):
         L = ', '.join([_xab_tostr(l) for l in expr.limits])
         return 'Sum(%s, %s)' % (self._print(expr.function), L)
 
+    def _print_Product(self, expr):
+        def _xab_tostr(xab):
+            if len(xab) == 1:
+                return self._print(xab[0])
+            else:
+                return self._print((xab[0],) + tuple(xab[1:]))
+        L = ', '.join([_xab_tostr(l) for l in expr.limits])
+        return 'Product(%s, %s)' % (self._print(expr.function), L)
+
     def _print_Symbol(self, expr):
         return expr.name
     _print_MatrixSymbol = _print_Symbol
