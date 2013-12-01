@@ -1766,6 +1766,51 @@ u("""\
 def test_pretty_product():
     n, m, k, l = symbols('n m k l')
     f = symbols('f', cls=Function)
+
+    expr = Product(f(x), x)
+
+    unicode_str = \
+u("""\
+          \n\
+┬───┬     \n\
+│   │ f(x)\n\
+│   │     \n\
+  x       \
+""")
+    ascii_str = \
+"""\
+          \n\
+_____     \n\
+|   | f(x)\n\
+|   |     \n\
+  x       \
+"""
+
+    assert pretty(expr) == ascii_str
+    assert upretty(expr) == unicode_str
+
+    expr = Product(f(x), (x,1))
+
+    unicode_str = \
+u("""\
+          \n\
+┬───┬     \n\
+│   │ f(x)\n\
+│   │     \n\
+x = 1     \
+""")
+    ascii_str = \
+"""\
+          \n\
+_____     \n\
+|   | f(x)\n\
+|   |     \n\
+x = 1     \
+"""
+
+    assert pretty(expr) == ascii_str
+    assert upretty(expr) == unicode_str
+
     expr = Product(f((n/3)**2), (n, k**2, l))
 
     unicode_str = \
@@ -3367,21 +3412,6 @@ k = 0   \
 """)
     assert pretty(expr) == ascii_str
     assert upretty(expr) == ucode_str
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     expr = Sum(k**(Integral(x**n, (x, -oo, oo))), (k, 0, n**n))
     ascii_str = \
