@@ -1789,7 +1789,7 @@ _____     \n\
     assert pretty(expr) == ascii_str
     assert upretty(expr) == unicode_str
 
-    expr = Product(f(x), (x,1))
+    expr = Product(f(x), (x,y))
 
     unicode_str = \
 u("""\
@@ -1797,15 +1797,15 @@ u("""\
 ┬───┬     \n\
 │   │ f(x)\n\
 │   │     \n\
-x = 1     \
+x ∈ y     \
 """)
     ascii_str = \
 """\
-          \n\
-_____     \n\
-|   | f(x)\n\
-|   |     \n\
-x = 1     \
+           \n\
+_____      \n\
+|   |  f(x)\n\
+|   |      \n\
+x in y     \
 """
 
     assert pretty(expr) == ascii_str
@@ -3363,16 +3363,16 @@ ___   \n\
     assert pretty(expr) == ascii_str
     assert upretty(expr) == ucode_str
 
-    expr = Sum(k**k, (k,0))
+    expr = Sum(k**k, (k,a))
     ascii_str = \
 """\
-        \n\
- ___    \n\
- \\  `   \n\
-  \\    k\n\
-  /   k \n\
- /__,   \n\
-k = 0   \
+         \n\
+ ___     \n\
+ \\  `    \n\
+  \\     k\n\
+  /    k \n\
+ /__,    \n\
+k in a   \
 """
     ucode_str = \
 u("""\
@@ -3383,7 +3383,7 @@ u("""\
   ╱   k \n\
  ╱      \n\
  ‾‾‾    \n\
-k = 0   \
+k ∈ a   \
 """)
     assert pretty(expr) == ascii_str
     assert upretty(expr) == ucode_str
