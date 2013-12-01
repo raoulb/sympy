@@ -405,7 +405,10 @@ class PrettyPrinter(Printer):
                 pretty_lower = self._print(C.Equality(lim[0], lim[1]))
             elif len(lim) == 2:
                 pretty_upper = self._print("")
-                pretty_lower = self._print(C.Equality(lim[0], lim[1]))
+                if self._use_unicode:
+                    pretty_lower = self._print_seq((lim[0], u("\u2208"), lim[1]), delimiter=" ")
+                else:
+                    pretty_lower = self._print_seq((lim[0], "in", lim[1]), delimiter=" ")
             elif len(lim) == 1:
                 pretty_upper = self._print("")
                 pretty_lower = self._print(lim[0])
@@ -509,7 +512,10 @@ class PrettyPrinter(Printer):
                 prettyLower = self._print(C.Equality(lim[0], lim[1]))
             elif len(lim) == 2:
                 prettyUpper = self._print("")
-                prettyLower = self._print(C.Equality(lim[0], lim[1]))
+                if ascii_mode:
+                    prettyLower = self._print_seq((lim[0], "in", lim[1]), delimiter=" ")
+                else:
+                    prettyLower = self._print_seq((lim[0], u("\u2208"), lim[1]), delimiter=" ")
             elif len(lim) == 1:
                 prettyUpper = self._print("")
                 prettyLower = self._print(lim[0])
