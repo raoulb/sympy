@@ -2,10 +2,10 @@ from __future__ import division
 
 from sympy import (Abs, Catalan, cos, Derivative, E, EulerGamma, exp,
     factorial, factorial2, Function, GoldenRatio, I, Integer, Integral,
-    Interval, Lambda, Limit, Matrix, nan, O, oo, pi, Rational, Float, Rel,
-    S, sin, SparseMatrix, sqrt, summation, Sum, Symbol, symbols, Wild,
-    WildFunction, zeta, zoo, Dummy, Dict, Tuple, FiniteSet, factor,
-    MatrixSymbol, subfactorial, true, false, Equivalent, Xor)
+    Interval, Lambda, Limit, Matrix, nan, O, oo, pi, product, Product,
+    Rational, Float, Rel, S, sin, SparseMatrix, sqrt, summation, Sum, Symbol,
+    symbols, Wild, WildFunction, zeta, zoo, Dummy, Dict, Tuple, FiniteSet,
+    factor, MatrixSymbol, subfactorial, true, false, Equivalent, Xor)
 from sympy.core import Expr
 from sympy.physics.units import second, joule
 from sympy.polys import Poly, RootOf, RootSum, groebner, ring, field, ZZ, QQ, lex, grlex
@@ -522,6 +522,12 @@ def test_Sum():
     assert str(summation(cos(3*z), (z, x, y))) == "Sum(cos(3*z), (z, x, y))"
     assert str(Sum(x*y**2, (x, -2, 2), (y, -5, 5))) == \
         "Sum(x*y**2, (x, -2, 2), (y, -5, 5))"
+
+
+def test_Product():
+    assert str(Product(cos(3*z), (z, x, y))) == "Product(cos(3*z), (z, x, y))"
+    assert str(Product(x*y**2, (x, -2, 2), (y, -5, 5))) == \
+        "Product(x*y**2, (x, -2, 2), (y, -5, 5))"
 
 
 def test_Symbol():
