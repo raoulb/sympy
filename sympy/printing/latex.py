@@ -409,11 +409,11 @@ class LatexPrinter(Printer):
         tex = r""
         for limit in reversed(expr.limits):
             if len(limit) == 1:
-                tex += "\sum_{%s} "
+                tex += r"\sum_{%s} "
             elif len(limit) == 2:
-                tex += "\sum_{%s=%s} "
+                tex += r"\sum_{%s \in %s} "
             elif len(limit) == 3:
-                tex += "\sum_{%s=%s}^{%s} "
+                tex += r"\sum_{%s=%s}^{%s} "
             tex = tex % tuple([ self._print(i) for i in limit ])
 
         if isinstance(expr.function, Add):
@@ -427,11 +427,11 @@ class LatexPrinter(Printer):
         tex = r""
         for limit in reversed(expr.limits):
             if len(limit) == 1:
-                tex += "\prod_{%s} "
+                tex += r"\prod_{%s} "
             elif len(limit) == 2:
-                tex += "\prod_{%s=%s} "
+                tex += r"\prod_{%s \in %s} "
             elif len(limit) == 3:
-                tex += "\prod_{%s=%s}^{%s} "
+                tex += r"\prod_{%s=%s}^{%s} "
             tex = tex % tuple([ self._print(i) for i in limit ])
 
         if isinstance(expr.function, Add):
