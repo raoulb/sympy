@@ -3292,6 +3292,57 @@ def test_settings():
 def test_pretty_sum():
     from sympy.abc import x, a, b, k, m, n
 
+    expr = Sum(k**k, k)
+    ascii_str = \
+"""\
+       \n\
+___    \n\
+\\  `   \n\
+ \\    k\n\
+ /   k \n\
+/__,   \n\
+ k     \
+"""
+    ucode_str = \
+u("""\
+      \n\
+___   \n\
+╲     \n\
+ ╲   k\n\
+ ╱  k \n\
+╱     \n\
+‾‾‾   \n\
+ k    \
+""")
+
+    assert pretty(expr) == ascii_str
+    assert upretty(expr) == ucode_str
+
+    expr = Sum(k**k, (k,0))
+    ascii_str = \
+"""\
+        \n\
+ ___    \n\
+ \\  `   \n\
+  \\    k\n\
+  /   k \n\
+ /__,   \n\
+k = 0   \
+"""
+    ucode_str = \
+u("""\
+        \n\
+ ___    \n\
+ ╲      \n\
+  ╲    k\n\
+  ╱   k \n\
+ ╱      \n\
+ ‾‾‾    \n\
+k = 0   \
+""")
+    assert pretty(expr) == ascii_str
+    assert upretty(expr) == ucode_str
+
     expr = Sum(k**k, (k, 0, n))
     ascii_str = \
 """\
@@ -3316,6 +3367,21 @@ k = 0   \
 """)
     assert pretty(expr) == ascii_str
     assert upretty(expr) == ucode_str
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     expr = Sum(k**(Integral(x**n, (x, -oo, oo))), (k, 0, n**n))
     ascii_str = \
