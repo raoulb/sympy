@@ -481,22 +481,18 @@ def test_latex_ImageSet():
 
 
 def test_latex_sum():
-    assert latex(Sum(x*y**2, (x, -2, 2), (y, -5, 5))) == \
-        r"\sum_{\substack{-2 \leq x \leq 2\\-5 \leq y \leq 5}} x y^{2}"
-    assert latex(Sum(x**2, (x, -2, 2))) == \
-        r"\sum_{x=-2}^{2} x^{2}"
-    assert latex(Sum(x**2 + y, (x, -2, 2))) == \
-        r"\sum_{x=-2}^{2} \left(x^{2} + y\right)"
-
+    assert latex(Sum(x, x)) == r"\sum_{x} x"
+    assert latex(Sum(x, (x, 1))) == r"\sum_{x=1} x"
+    assert latex(Sum(x, (x, 1, 5))) == r"\sum_{x=1}^{5} x"
+    assert latex(Sum(x, x, y)) == r"\sum_{y} \sum_{x} x"
+    assert latex(Sum(x, x, (y, z), (z, 1, 5))) == r"\sum_{z=1}^{5} \sum_{y=z} \sum_{x} x"
 
 def test_latex_product():
-    assert latex(Product(x*y**2, (x, -2, 2), (y, -5, 5))) == \
-        r"\prod_{\substack{-2 \leq x \leq 2\\-5 \leq y \leq 5}} x y^{2}"
-    assert latex(Product(x**2, (x, -2, 2))) == \
-        r"\prod_{x=-2}^{2} x^{2}"
-    assert latex(Product(x**2 + y, (x, -2, 2))) == \
-        r"\prod_{x=-2}^{2} \left(x^{2} + y\right)"
-
+    assert latex(Product(x, x)) == r"\prod_{x} x"
+    assert latex(Product(x, (x, 1))) == r"\prod_{x=1} x"
+    assert latex(Product(x, (x, 1, 5))) == r"\prod_{x=1}^{5} x"
+    assert latex(Product(x, x, y)) == r"\prod_{y} \prod_{x} x"
+    assert latex(Product(x, x, (y, z), (z, 1, 5))) == r"\prod_{z=1}^{5} \prod_{y=z} \prod_{x} x"
 
 def test_latex_limits():
     assert latex(Limit(x, x, oo)) == r"\lim_{x \to \infty} x"
