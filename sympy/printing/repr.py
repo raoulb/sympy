@@ -133,6 +133,10 @@ class ReprPrinter(Printer):
         return "Sum2(%s, (%s, %s, %s))" % (self._print(expr.f), self._print(expr.i),
                                            self._print(expr.a), self._print(expr.b))
 
+    def _print_Product2(self, expr):
+        return "Product2(%s, (%s, %s, %s))" % (self._print(expr.f), self._print(expr.i),
+                                               self._print(expr.a), self._print(expr.b))
+
     def _print_Symbol(self, expr):
         return "%s(%s)" % (expr.__class__.__name__, self._print(expr.name))
 
