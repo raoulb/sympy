@@ -482,17 +482,17 @@ def test_latex_ImageSet():
 
 def test_latex_sum():
     assert latex(Sum(x, x)) == r"\sum_{x} x"
-    assert latex(Sum(x, (x, 1))) == r"\sum_{x=1} x"
+    assert latex(Sum(x, (x, y))) == r"\sum_{x \in y} x"
     assert latex(Sum(x, (x, 1, 5))) == r"\sum_{x=1}^{5} x"
     assert latex(Sum(x, x, y)) == r"\sum_{y} \sum_{x} x"
-    assert latex(Sum(x, x, (y, z), (z, 1, 5))) == r"\sum_{z=1}^{5} \sum_{y=z} \sum_{x} x"
+    assert latex(Sum(x, x, (y, z), (z, 1, 5))) == r"\sum_{z=1}^{5} \sum_{y \in z} \sum_{x} x"
 
 def test_latex_product():
     assert latex(Product(x, x)) == r"\prod_{x} x"
-    assert latex(Product(x, (x, 1))) == r"\prod_{x=1} x"
+    assert latex(Product(x, (x, y))) == r"\prod_{x \in y} x"
     assert latex(Product(x, (x, 1, 5))) == r"\prod_{x=1}^{5} x"
     assert latex(Product(x, x, y)) == r"\prod_{y} \prod_{x} x"
-    assert latex(Product(x, x, (y, z), (z, 1, 5))) == r"\prod_{z=1}^{5} \prod_{y=z} \prod_{x} x"
+    assert latex(Product(x, x, (y, z), (z, 1, 5))) == r"\prod_{z=1}^{5} \prod_{y \in z} \prod_{x} x"
 
 def test_latex_limits():
     assert latex(Limit(x, x, oo)) == r"\lim_{x \to \infty} x"
