@@ -519,15 +519,35 @@ def test_SparseMatrix():
 
 
 def test_Sum():
-    assert str(summation(cos(3*z), (z, x, y))) == "Sum(cos(3*z), (z, x, y))"
-    assert str(Sum(x*y**2, (x, -2, 2), (y, -5, 5))) == \
-        "Sum(x*y**2, (x, -2, 2), (y, -5, 5))"
+    f = Function("f")
+
+    assert str(Sum(f(x), x)) == "Sum(f(x), x)"
+    assert str(Sum(f(x), (x,))) == "Sum(f(x), x)"
+    assert str(Sum(f(x), (x,y))) == "Sum(f(x), (x, y))"
+    assert str(Sum(f(x), (x,y,z))) == "Sum(f(x), (x, y, z))"
+
+    assert str(Sum(f(x,y), x, y)) == "Sum(f(x, y), x, y)"
+    assert str(Sum(f(x,y), (x,), (y,))) == "Sum(f(x, y), x, y)"
+    assert str(Sum(f(x,y), (x,1), (y,2))) == "Sum(f(x, y), (x, 1), (y, 2))"
+    assert str(Sum(f(x,y), (x,1,y), (y,2,6))) == "Sum(f(x, y), (x, 1, y), (y, 2, 6))"
+
+    assert str(summation(f(x), (x,y,z))) == "Sum(f(x), (x, y, z))"
 
 
 def test_Product():
-    assert str(Product(cos(3*z), (z, x, y))) == "Product(cos(3*z), (z, x, y))"
-    assert str(Product(x*y**2, (x, -2, 2), (y, -5, 5))) == \
-        "Product(x*y**2, (x, -2, 2), (y, -5, 5))"
+    f = Function("f")
+
+    assert str(Product(f(x), x)) == "Product(f(x), x)"
+    assert str(Product(f(x), (x,))) == "Product(f(x), x)"
+    assert str(Product(f(x), (x,y))) == "Product(f(x), (x, y))"
+    assert str(Product(f(x), (x,y,z))) == "Product(f(x), (x, y, z))"
+
+    assert str(Product(f(x,y), x, y)) == "Product(f(x, y), x, y)"
+    assert str(Product(f(x,y), (x,), (y,))) == "Product(f(x, y), x, y)"
+    assert str(Product(f(x,y), (x,1), (y,2))) == "Product(f(x, y), (x, 1), (y, 2))"
+    assert str(Product(f(x,y), (x,1,y), (y,2,6))) == "Product(f(x, y), (x, 1, y), (y, 2, 6))"
+
+    assert str(product(f(x), (x,y,z))) == "Product(f(x), (x, y, z))"
 
 
 def test_Symbol():
