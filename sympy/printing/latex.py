@@ -406,16 +406,15 @@ class LatexPrinter(Printer):
                               self._print(expr.exp))
 
     def _print_Sum(self, expr):
-        if len(expr.limits) == 1:
-            tex = r"\sum_{%s=%s}^{%s} " % \
-                tuple([ self._print(i) for i in expr.limits[0] ])
-        else:
-            def _format_ineq(l):
-                return r"%s \leq %s \leq %s" % \
-                    tuple([self._print(s) for s in (l[1], l[0], l[2])])
-
-            tex = r"\sum_{\substack{%s}} " % \
-                str.join('\\\\', [ _format_ineq(l) for l in expr.limits ])
+        tex = r""
+        for limit in reversed(expr.limits):
+            if len(limit) == 1:
+                tex += "\sum_{%s} "
+            elif len(limit) == 2:
+                tex += "\sum_{%s=%s} "
+            elif len(limit) == 3:
+                tex += "\sum_{%s=%s}^{%s} "
+            tex = tex % tuple([ self._print(i) for i in limit ])
 
         if isinstance(expr.function, Add):
             tex += r"\left(%s\right)" % self._print(expr.function)
@@ -425,16 +424,15 @@ class LatexPrinter(Printer):
         return tex
 
     def _print_Product(self, expr):
-        if len(expr.limits) == 1:
-            tex = r"\prod_{%s=%s}^{%s} " % \
-                tuple([ self._print(i) for i in expr.limits[0] ])
-        else:
-            def _format_ineq(l):
-                return r"%s \leq %s \leq %s" % \
-                    tuple([self._print(s) for s in (l[1], l[0], l[2])])
-
-            tex = r"\prod_{\substack{%s}} " % \
-                str.join('\\\\', [ _format_ineq(l) for l in expr.limits ])
+        tex = r""
+        for limit in reversed(expr.limits):
+            if len(limit) == 1:
+                tex += "\prod_{%s} "
+            elif len(limit) == 2:
+                tex += "\prod_{%s=%s} "
+            elif len(limit) == 3:
+                tex += "\prod_{%s=%s}^{%s} "
+            tex = tex % tuple([ self._print(i) for i in limit ])
 
         if isinstance(expr.function, Add):
             tex += r"\left(%s\right)" % self._print(expr.function)
