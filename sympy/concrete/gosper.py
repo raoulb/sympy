@@ -5,148 +5,114 @@ from sympy.core import S, Dummy, symbols
 from sympy.core.compatibility import is_sequence, xrange
 from sympy.polys import Poly, parallel_poly_from_expr, factor
 from sympy.concrete.dispersion import dispersionset
-from sympy.solvers import solve
+from sympy.concrete.compare_coefficients import build_matrix
+from sympy.solvers.linear import solve_general_linear
+from sympy.utilities import flatten
 from sympy.simplify import hypersimp
 
 
-def gosper_normal(f, g, n, polys=True):
-    r"""
-    Compute the Gosper's normal form of ``f`` and ``g``.
+def gosper_normalize(f, g):
+    lcf = f.LC()
+    lcg = g.LC()
+    F = f.monic()
+    G = g.monic()
+    Z = lcf / lcg
 
-    Given relatively prime univariate polynomials ``f`` and ``g``,
-    rewrite their quotient to a normal form defined as follows:
+    p = F.one
+    q = F.shift(-1)
+    r = G.shift(-1)
 
-    .. math::
-        \frac{f(n)}{g(n)} = Z \cdot \frac{A(n) C(n+1)}{B(n) C(n)}
+    J = dispersionset(F, G)
 
-    where ``Z`` is an arbitrary constant and ``A``, ``B``, ``C`` are
-    monic polynomials in ``n`` with the following properties:
+    for j in sorted(J):
+        gj = q.gcd(r.shift(j))
+        # Update
+        q = q.quo(gj)
+        r = r.quo(gj.shift(-j))
+        for i in xrange(0, j):
+            p *= gj.shift(-i)
 
-    1. `\gcd(A(n), B(n+h)) = 1 \forall h \in \mathbb{N}`
-    2. `\gcd(B(n), C(n+1)) = 1`
-    3. `\gcd(A(n), C(n)) = 1`
+    q = q.mul_ground(Z)
 
-    This normal form, or rational factorization in other words, is a
-    crucial step in Gosper's algorithm and in solving of difference
-    equations. It can be also used to decide if two hypergeometric
-    terms are similar or not.
+    return (q, r, p)
 
-    This procedure will return a tuple containing elements of this
-    factorization in the form ``(Z*A, B, C)``.
 
-    Examples
-    ========
-
-    >>> from sympy.concrete.gosper import gosper_normal
-    >>> from sympy.abc import n
-
-    >>> gosper_normal(4*n+5, 2*(4*n+1)*(2*n+3), n, polys=False)
-    (1/4, n + 3/2, n + 1/4)
-
+def degree_bound(p, q, r):
+    r"""Gosper degree bound for :math:`f_k`.
     """
-    (p, q), opt = parallel_poly_from_expr(
-        (f, g), n, field=True, extension=True)
-
-    a, A = p.LC(), p.monic()
-    b, B = q.LC(), q.monic()
-
-    C, Z = A.one, a/b
-
-    J = dispersionset(A, B)
-
-    for i in sorted(J):
-        d = A.gcd(B.shift(+i))
-
-        A = A.quo(d)
-        B = B.quo(d.shift(-i))
-
-        for j in xrange(1, i + 1):
-            C *= d.shift(-j)
-
-    A = A.mul_ground(Z)
-
-    if not polys:
-        A = A.as_expr()
-        B = B.as_expr()
-        C = C.as_expr()
-
-    return A, B, C
+    qpr = q.shift(1) + r
+    qmr = q.shift(1) - r
+    dqpr = qpr.degree()
+    dqmr = qmr.degree()
+    dp = S(p.degree())
+    if dqpr <= dqmr:
+        df = dp - dqmr
+    else:
+        k = p.gen
+        a = S(qpr.coeff_monomial(k**dqpr))
+        if dqpr > 0: # TODO: Recheck
+            b = S(qmr.coeff_monomial(k**(dqpr-1)))
+        else:
+            b = 0
+        if -2*b/a < 0:
+            df = dp - dqpr + 1
+        else:
+            df = max(-2*b/a, dp-dqpr+1)
+    return df
 
 
-def gosper_term(f, n):
+def rational_certificate(p, q, r):
     r"""
-    Compute Gosper's hypergeometric term for ``f``.
-
-    Suppose ``f`` is a hypergeometric term such that:
-
-    .. math::
-        s_n = \sum_{k=0}^{n-1} f_k
-
-    and `f_k` doesn't depend on `n`. Returns a hypergeometric
-    term `g_n` such that `g_{n+1} - g_n = f_n`.
-
-    Examples
-    ========
-
-    >>> from sympy.concrete.gosper import gosper_term
-    >>> from sympy.functions import factorial
-    >>> from sympy.abc import n
-
-    >>> gosper_term((4*n + 1)*factorial(n)/factorial(2*n + 1), n)
-    (-n - 1/2)/(n + 1/4)
-
     """
-    r = hypersimp(f, n)
+    df = degree_bound(p, q, r)
 
+    if df < 0:
+        return None
+        raise ValueError("Not Gosper summable")
+
+    coeffs = symbols('c:%s' % (df + 1), cls=Dummy)
+    domain = q.get_domain().inject(*coeffs)
+    f = Poly(coeffs, p.gen, domain=domain)
+
+    # Correct:
+    eqn1 = q.shift(1)*f.shift(1) - r*f.shift(0) - p # OK
+    #eqn1 = q.shift(1)*f - r*f.shift(-1) - p
+    eqn = eqn1.as_poly(p.gen)
+
+    M, v = build_matrix(eqn, coeffs)
+
+    try:
+        sol, params = solve_general_linear(M, v)
+        sol, params = flatten(sol.tolist()), flatten(params.tolist())
+    except:
+        return None
+
+    # Construct the solution g
+    vals = [(var,val) for var, val in zip(coeffs, sol)]
+    params = [(pa,0) for pa in params]
+    fsol = f.shift(0).subs(vals+params) # OK
+    #fsol = fsol.as_poly(p.gen, extension=True).shift(-1)
+
+    return r/p * fsol
+
+
+def gosper_main(a, n):
+    r = hypersimp(a, n)
     if r is None:
-        return None    # 'f' is *not* a hypergeometric term
+        return None
+        #raise ValueError("Could not simplify input into hypergeometric term")
 
-    p, q = r.as_numer_denom()
+    u, v = r.as_numer_denom()
+    (u, v), opt = parallel_poly_from_expr((u, v), n, field=True, extension=True)
 
-    A, B, C = gosper_normal(p, q, n)
-    B = B.shift(-1)
+    q, r, p = gosper_normalize(u, v)
 
-    N = S(A.degree())
-    M = S(B.degree())
-    K = S(C.degree())
+    R = rational_certificate(p, q, r)
 
-    if (N != M) or (A.LC() != B.LC()):
-        D = set([K - max(N, M)])
-    elif not N:
-        D = set([K - N + 1, S(0)])
-    else:
-        D = set([K - N + 1, (B.nth(N - 1) - A.nth(N - 1))/A.LC()])
+    if R is None:
+        return None
 
-    for d in set(D):
-        if not d.is_Integer or d < 0:
-            D.remove(d)
-
-    if not D:
-        return None    # 'f(n)' is *not* Gosper-summable
-
-    d = max(D)
-
-    coeffs = symbols('c:%s' % (d + 1), cls=Dummy)
-    domain = A.get_domain().inject(*coeffs)
-
-    x = Poly(coeffs, n, domain=domain)
-    H = A*x.shift(1) - B*x - C
-
-    solution = solve(H.coeffs(), coeffs)
-
-    if solution is None:
-        return None    # 'f(n)' is *not* Gosper-summable
-
-    x = x.as_expr().subs(solution)
-
-    for coeff in coeffs:
-        if coeff not in solution:
-            x = x.subs(coeff, 0)
-
-    if x is S.Zero:
-        return None    # 'f(n)' is *not* Gosper-summable
-    else:
-        return B.as_expr()*x/C.as_expr()
+    return R * a
 
 
 def gosper_sum(f, k):
@@ -186,7 +152,6 @@ def gosper_sum(f, k):
 
     .. [1] Marko Petkovsek, Herbert S. Wilf, Doron Zeilberger, A = B,
            AK Peters, Ltd., Wellesley, MA, USA, 1997, pp. 73--100
-
     """
     indefinite = False
 
@@ -195,19 +160,18 @@ def gosper_sum(f, k):
     else:
         indefinite = True
 
-    g = gosper_term(f, k)
+    g = gosper_main(f, k)
 
     if g is None:
         return None
 
     if indefinite:
-        result = f*g
+        result = g
     else:
-        result = (f*(g + 1)).subs(k, b) - (f*g).subs(k, a)
-
+        result = g.subs(k, b + 1) - g.subs(k, a)
         if result is S.NaN:
             try:
-                result = (f*(g + 1)).limit(k, b) - (f*g).limit(k, a)
+                result = g.limit(k, b + 1) - g.limit(k, a)
             except NotImplementedError:
                 result = None
 
