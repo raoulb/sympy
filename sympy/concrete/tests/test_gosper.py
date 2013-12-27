@@ -5,16 +5,6 @@ from sympy.abc import a, b, j, k, m, n, r, x
 from sympy.concrete.gosper import gosper_normal, gosper_sum, gosper_term
 
 
-def test_gosper_normal():
-    assert gosper_normal(4*n + 5, 2*(4*n + 1)*(2*n + 3), n) == \
-        (Poly(S(1)/4, n), Poly(n + S(3)/2), Poly(n + S(1)/4))
-
-
-def test_gosper_term():
-    assert gosper_term((4*k + 1)*factorial(
-        k)/factorial(2*k + 1), k) == (-k - S(1)/2)/(k + S(1)/4)
-
-
 def test_gosper_sum():
     assert gosper_sum(1, (k, 0, n)) == 1 + n
     assert gosper_sum(k, (k, 0, n)) == n*(1 + n)/2
@@ -30,8 +20,8 @@ def test_gosper_sum():
     assert gosper_sum((k - 3)*factorial(k), (k, 0, n)) is None
 
     assert gosper_sum(k*factorial(k), k) == factorial(k)
-    assert gosper_sum(
-        k*factorial(k), (k, 0, n)) == n*factorial(n) + factorial(n) - 1
+    assert simplify(gosper_sum(
+        k*factorial(k), (k, 0, n))) == n*factorial(n) + factorial(n) - 1
 
     assert gosper_sum((-1)**k*binomial(n, k), (k, 0, n)) == 0
     assert gosper_sum((
@@ -75,10 +65,10 @@ def test_gosper_sum_iterated():
     f4 = (1 + 2*n)*(3 + 2*n)*(5 + 2*n)*binomial(2*n, n)/(15*4**n)
     f5 = (1 + 2*n)*(3 + 2*n)*(5 + 2*n)*(7 + 2*n)*binomial(2*n, n)/(105*4**n)
 
-    assert gosper_sum(f1, (k, 0, n)) == f2
-    assert gosper_sum(f2, (n, 0, n)) == f3
-    assert gosper_sum(f3, (n, 0, n)) == f4
-    assert gosper_sum(f4, (n, 0, n)) == f5
+    assert simplify(gosper_sum(f1, (k, 0, n))) == f2
+    assert simplify(gosper_sum(f2, (n, 0, n))) == f3
+    assert simplify(gosper_sum(f3, (n, 0, n))) == f4
+    assert simplify(gosper_sum(f4, (n, 0, n))) == f5
 
 # the AeqB tests test expressions given in
 # www.math.upenn.edu/~wilf/AeqB.pdf
@@ -104,7 +94,8 @@ def test_gosper_sum_AeqB_part1():
         3*m + 2)/(40*27**m*factorial(m)*factorial(m + 1)*factorial(m + 2))
     g1f = (2*m + 1)**2*binomial(2*m, m)**2/(4**(2*m)*(m + 1))
     g1g = -binomial(2*m, m)**2/4**(2*m)
-    g1h = -(2*m + 1)**2*(3*m + 4)*factorial(m - S(1)/2)**2/factorial(m + 1)**2
+    #g1h = -(2*m + 1)**2*(3*m + 4)*factorial(m - S(1)/2)**2/factorial(m + 1)**2
+    g1h = -4*(m + 2)**2*(3*m + 4)*(factorial(m + S(1)/2))**2/(factorial(m + 2))**2
 
     g = gosper_sum(f1a, (n, 0, m))
     assert g is not None and simplify(g - g1a) == 0
