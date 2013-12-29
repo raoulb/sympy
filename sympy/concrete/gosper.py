@@ -4,7 +4,7 @@ from __future__ import print_function, division
 from sympy.core import S, Dummy, symbols
 from sympy.core.compatibility import is_sequence, xrange
 from sympy.polys import Poly, parallel_poly_from_expr, factor
-from sympy.concrete.dispersion import dispersionset
+from sympy.polys.dispersion import dispersionset
 from sympy.concrete.compare_coefficients import build_matrix
 from sympy.solvers.linear import solve_general_linear
 from sympy.utilities import flatten
