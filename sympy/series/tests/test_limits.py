@@ -12,8 +12,8 @@ from sympy.core.mul import Mul
 from sympy.series.limits import heuristics
 from sympy.series.order import Order
 from sympy.utilities.pytest import XFAIL, raises
-from sympy.core.numbers import GoldenRatio
-from sympy.functions.combinatorial.numbers import fibonacci
+from sympy.core.numbers import GoldenRatio, TribonacciConstant
+from sympy.functions.combinatorial.numbers import fibonacci, tribonacci
 
 from sympy.abc import x, y, z, k
 n = Symbol('n', integer=True, positive=True)
@@ -116,7 +116,11 @@ def test_issue_3885():
 
 def test_issue_10382():
     n = Symbol('n', integer=True)
-    assert limit(fibonacci(n+1)/fibonacci(n), n, oo) == S.GoldenRatio
+    assert limit(fibonacci(n+1)/fibonacci(n), n, oo) == GoldenRatio
+
+def test_tribonacci():
+    n = Symbol('n', integer=True)
+    assert limit(tribonacci(n+1)/tribonacci(n), n, oo) == TribonacciConstant
 
 
 def test_Limit():
