@@ -3,6 +3,7 @@ from __future__ import print_function, division
 from sympy.core import S, Symbol, Add, sympify, Expr, PoleError, Mul
 from sympy.core.compatibility import string_types
 from sympy.core.symbol import Dummy
+from sympy.functions.elementary.complexes import sqrt
 from sympy.functions.combinatorial.factorials import factorial
 from sympy.core.numbers import GoldenRatio, TribonacciConstant
 from sympy.functions.combinatorial.numbers import fibonacci, tribonacci
@@ -189,7 +190,7 @@ class Limit(Expr):
             if abs(z0) is S.Infinity:
                 e = factor_terms(e)
                 e = e.rewrite(fibonacci, GoldenRatio)
-                e = e.rewrite(tribonacci, TribonacciConstant)
+                e = e.rewrite(tribonacci, sqrt)
                 ok = lambda w: (z in w.free_symbols and
                                 any(a.is_polynomial(z) or
                                     any(z in m.free_symbols and m.is_polynomial(z)
